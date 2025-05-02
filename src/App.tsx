@@ -12,6 +12,7 @@ import AddItem from "./pages/AddItem";
 import NotFound from "./pages/NotFound";
 import OutfitGenerator from "./pages/OutfitGenerator";
 import Marketplace from "./pages/Marketplace";
+import OutfitPost from "./pages/OutfitPost";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/add-item" element={<AddItem />} />
           <Route path="/outfit-generator" element={<OutfitGenerator />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/post/:postId" element={<OutfitPost />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

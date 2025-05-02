@@ -12,6 +12,11 @@ import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
+import Stories from '@/components/Social/Stories';
+import Feed from '@/components/Social/Feed';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CameraCapture from '@/components/Camera/CameraCapture';
+import { toast } from 'sonner';
 
 // Sample data
 const mockWeather = {
@@ -183,6 +188,8 @@ const Home = () => {
   const [events] = useState(mockEvents);
   const [outfits] = useState(mockOutfits);
   const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('list');
+  const [showCamera, setShowCamera] = useState(false);
+  const [activeTab, setActiveTab] = useState<'for-you' | 'feed'>('for-you');
   const [personalPreferences] = useState({
     favoriteColors: ['Blue', 'Teal', 'Beige'],
     stylePersonality: ['Professional', 'Creative', 'Casual'],
@@ -197,6 +204,11 @@ const Home = () => {
       day: 'numeric' 
     };
     return new Date().toLocaleDateString('en-US', options);
+  };
+  
+  const handleCapture = (imageSrc: string) => {
+    setShowCamera(false);
+    toast.success("Story created successfully!");
   };
 
   return (
@@ -213,108 +225,142 @@ const Home = () => {
           </div>
         </div>
       </div>
-
-      <section className="mb-8 animate-fade-in">
-        <h2 className="text-lg font-semibold mb-4">Today's Perfect Outfit</h2>
-        <PersonalizedOutfit 
-          outfit={outfits[0]}
-          personalityTraits={personalPreferences.stylePersonality}
-          matchScore={personalPreferences.matchScore}
-          onClick={() => navigate(`/outfit/${outfits[0].id}`)}
-          className="mb-4"
+      
+      {/* Stories Section */}
+      <section className="mb-6">
+        <Stories 
+          onCreateStory={() => setShowCamera(true)}
+          className="animate-fade-in"
         />
-        <div className="mt-4">
-          <OutfitGenerator wardrobe={mockWardrobe} />
-        </div>
       </section>
 
-      <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Other Outfit Suggestions</h2>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={cn(displayMode === 'grid' && "text-closetx-teal")}
-              onClick={() => setDisplayMode('grid')}
-            >
-              <Grid3x3 size={16} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={cn(displayMode === 'list' && "text-closetx-teal")}
-              onClick={() => setDisplayMode('list')}
-            >
-              <ListOrdered size={16} />
-            </Button>
-          </div>
-        </div>
+      {/* Main Content Tabs */}
+      <Tabs 
+        defaultValue="for-you" 
+        value={activeTab} 
+        onValueChange={(value) => setActiveTab(value as 'for-you' | 'feed')}
+        className="animate-fade-in"
+      >
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="for-you">For You</TabsTrigger>
+          <TabsTrigger value="feed">Feed</TabsTrigger>
+        </TabsList>
         
-        <Carousel>
-          <CarouselContent>
-            {outfits.slice(1).map((outfit) => (
-              <CarouselItem key={outfit.id} className="md:basis-1/2 lg:basis-1/3">
-                <PersonalizedOutfit 
-                  outfit={outfit}
-                  personalityTraits={personalPreferences.stylePersonality.slice(0, 2)}
-                  matchScore={3.5 + Math.random() * 1.5}
-                  onClick={() => navigate(`/outfit/${outfit.id}`)}
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="flex justify-center mt-4">
-            <CarouselPrevious className="relative inset-0 translate-y-0 mr-2" />
-            <CarouselNext className="relative inset-0 translate-y-0 ml-2" />
-          </div>
-        </Carousel>
-      </section>
-
-      <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Today's Schedule</h2>
-          <Button variant="ghost" className="p-1 text-closetx-teal">
-            <Calendar size={18} />
-          </Button>
-        </div>
-        {events.length > 0 ? (
-          <div className="space-y-3">
-            {events.map((event) => (
-              <div 
-                key={event.id} 
-                className="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
-              >
-                <div className="flex justify-between">
-                  <p className="font-medium">{event.title}</p>
-                  <p className="text-sm text-gray-500">{event.time}</p>
-                </div>
+        <TabsContent value="for-you" className="space-y-8">
+          <section className="animate-fade-in">
+            <h2 className="text-lg font-semibold mb-4">Today's Perfect Outfit</h2>
+            <PersonalizedOutfit 
+              outfit={outfits[0]}
+              personalityTraits={personalPreferences.stylePersonality}
+              matchScore={personalPreferences.matchScore}
+              onClick={() => navigate(`/outfit/${outfits[0].id}`)}
+              className="mb-4"
+            />
+            <div className="mt-4">
+              <OutfitGenerator wardrobe={mockWardrobe} />
+            </div>
+          </section>
+          
+          <section className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Other Outfit Suggestions</h2>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={cn(displayMode === 'grid' && "text-closetx-teal")}
+                  onClick={() => setDisplayMode('grid')}
+                >
+                  <Grid3x3 size={16} />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={cn(displayMode === 'list' && "text-closetx-teal")}
+                  onClick={() => setDisplayMode('list')}
+                >
+                  <ListOrdered size={16} />
+                </Button>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center py-4 text-gray-500">No events today</p>
-        )}
-      </section>
+            </div>
+            
+            <Carousel>
+              <CarouselContent>
+                {outfits.slice(1).map((outfit) => (
+                  <CarouselItem key={outfit.id} className="md:basis-1/2 lg:basis-1/3">
+                    <PersonalizedOutfit 
+                      outfit={outfit}
+                      personalityTraits={personalPreferences.stylePersonality.slice(0, 2)}
+                      matchScore={3.5 + Math.random() * 1.5}
+                      onClick={() => navigate(`/outfit/${outfit.id}`)}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex justify-center mt-4">
+                <CarouselPrevious className="relative inset-0 translate-y-0 mr-2" />
+                <CarouselNext className="relative inset-0 translate-y-0 ml-2" />
+              </div>
+            </Carousel>
+          </section>
 
-      <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <MarketplacePreview />
-      </section>
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Today's Schedule</h2>
+              <Button variant="ghost" className="p-1 text-closetx-teal">
+                <Calendar size={18} />
+              </Button>
+            </div>
+            {events.length > 0 ? (
+              <div className="space-y-3">
+                {events.map((event) => (
+                  <div 
+                    key={event.id} 
+                    className="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+                  >
+                    <div className="flex justify-between">
+                      <p className="font-medium">{event.title}</p>
+                      <p className="text-sm text-gray-500">{event.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-4 text-gray-500">No events today</p>
+            )}
+          </section>
 
-      <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-        <div className="flex flex-col gap-4">
-          <WardrobeSharing />
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/marketplace')}
-            className="w-full flex gap-2"
-          >
-            <Star size={16} />
-            Discover Sustainable Fashion
-            <ArrowRight size={16} className="ml-auto" />
-          </Button>
-        </div>
-      </section>
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <MarketplacePreview />
+          </section>
+
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="flex flex-col gap-4">
+              <WardrobeSharing />
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/marketplace')}
+                className="w-full flex gap-2"
+              >
+                <Star size={16} />
+                Discover Sustainable Fashion
+                <ArrowRight size={16} className="ml-auto" />
+              </Button>
+            </div>
+          </section>
+        </TabsContent>
+        
+        <TabsContent value="feed">
+          <Feed />
+        </TabsContent>
+      </Tabs>
+      
+      {showCamera && (
+        <CameraCapture 
+          onCapture={handleCapture} 
+          onClose={() => setShowCamera(false)}
+        />
+      )}
     </AppLayout>
   );
 };
