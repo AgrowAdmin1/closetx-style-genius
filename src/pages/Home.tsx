@@ -4,13 +4,56 @@ import { Button } from '@/components/ui/button';
 import OutfitSuggestion, { OutfitType } from '@/components/Wardrobe/OutfitSuggestion';
 import AppLayout from '@/components/Layout/AppLayout';
 import { useNavigate } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { Calendar, Star, ArrowRight, Users } from 'lucide-react';
+import OutfitGenerator from '@/components/OutfitGenerator/OutfitGenerator';
+import MarketplacePreview from '@/components/Marketplace/MarketplacePreview';
+import WardrobeSharing from '@/components/Sharing/WardrobeSharing';
+import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 
 // Sample data
 const mockWeather = {
   temp: 28,
   condition: 'Sunny',
 };
+
+const mockWardrobe: ClothingItemType[] = [
+  {
+    id: '1',
+    name: 'White Cotton Shirt',
+    category: 'Tops',
+    color: 'White',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    season: ['Spring', 'Summer', 'Fall'],
+    brand: 'Zara'
+  },
+  {
+    id: '2',
+    name: 'Blue Denim Jeans',
+    category: 'Bottoms',
+    color: 'Blue',
+    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    season: ['All Season'],
+    brand: 'Levi\'s'
+  },
+  {
+    id: '3',
+    name: 'Black Leather Jacket',
+    category: 'Outerwear',
+    color: 'Black',
+    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    season: ['Fall', 'Winter'],
+    brand: 'H&M'
+  },
+  {
+    id: '4',
+    name: 'White Sneakers',
+    category: 'Footwear',
+    color: 'White',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    season: ['All Season'],
+    brand: 'Nike'
+  },
+];
 
 const mockOutfits: OutfitType[] = [
   {
@@ -112,12 +155,7 @@ const Home = () => {
           onClick={() => navigate(`/outfit/${outfits[0].id}`)}
         />
         <div className="mt-4">
-          <Button 
-            className="w-full bg-closetx-terracotta hover:bg-closetx-terracotta/90 text-white"
-            onClick={() => navigate('/outfit-generator')}
-          >
-            Generate New Outfit
-          </Button>
+          <OutfitGenerator wardrobe={mockWardrobe} />
         </div>
       </section>
 
@@ -148,15 +186,21 @@ const Home = () => {
       </section>
 
       <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <h2 className="text-lg font-semibold mb-4">More Outfit Ideas</h2>
-        <div className="space-y-4">
-          {outfits.slice(1).map((outfit) => (
-            <OutfitSuggestion 
-              key={outfit.id}
-              outfit={outfit}
-              onClick={() => navigate(`/outfit/${outfit.id}`)}
-            />
-          ))}
+        <MarketplacePreview />
+      </section>
+
+      <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+        <div className="flex flex-col gap-4">
+          <WardrobeSharing />
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/marketplace')}
+            className="w-full flex gap-2"
+          >
+            <Star size={16} />
+            Discover Sustainable Fashion
+            <ArrowRight size={16} className="ml-auto" />
+          </Button>
         </div>
       </section>
     </AppLayout>

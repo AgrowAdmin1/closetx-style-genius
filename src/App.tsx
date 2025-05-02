@@ -10,6 +10,8 @@ import Discover from "./pages/Discover";
 import Profile from "./pages/Profile";
 import AddItem from "./pages/AddItem";
 import NotFound from "./pages/NotFound";
+import OutfitGenerator from "./pages/OutfitGenerator";
+import Marketplace from "./pages/Marketplace";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/discover" element={<Discover />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-item" element={<AddItem />} />
+          <Route path="/outfit-generator" element={<OutfitGenerator />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
