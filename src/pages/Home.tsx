@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import OutfitSuggestion, { OutfitType } from '@/components/Wardrobe/OutfitSuggestion';
@@ -12,6 +11,7 @@ import WardrobeSharing from '@/components/Sharing/WardrobeSharing';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { cn } from '@/lib/utils';
 
 // Sample data
 const mockWeather = {
