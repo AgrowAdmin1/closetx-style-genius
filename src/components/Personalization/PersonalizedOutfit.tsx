@@ -18,6 +18,16 @@ interface PersonalizedOutfitProps {
   className?: string;
 }
 
+// Natural outfit image URLs
+const naturalOutfitImages = [
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b",
+  "https://images.unsplash.com/photo-1554412933-514a83d2f3c8",
+  "https://images.unsplash.com/photo-1596609548086-85bbf8ddb6b9"
+];
+
 const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
   outfit,
   userName = 'Priya',
@@ -28,6 +38,13 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
 }) => {
   const [liked, setLiked] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
+  
+  // Get a natural image instead of the original one
+  const getEnhancedOutfitImage = () => {
+    // Use the outfit ID to consistently select the same image for the same outfit
+    const index = parseInt(outfit.id) % naturalOutfitImages.length;
+    return naturalOutfitImages[index] || outfit.thumbnail;
+  };
   
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,9 +73,9 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
       <div className="relative">
         <div className="aspect-[16/9]">
           <img 
-            src={outfit.thumbnail} 
+            src={getEnhancedOutfitImage()} 
             alt={outfit.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
           />
         </div>
         
@@ -72,7 +89,7 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
             )}
             onClick={handleLike}
           >
-            <Heart size={16} className={cn(liked && "fill-current")} />
+            <Heart size={16} className={cn(liked && "fill-current animate-pulse")} />
           </Button>
           
           <Button
@@ -107,7 +124,7 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
             <ThumbsUp size={14} className="text-closetx-teal" />
             <span className="text-sm font-medium">{matchScore * 20}% match</span>
           </div>
-          <StarRating rating={matchScore} size={14} />
+          <StarRating rating={matchScore} size={14} animated={true} />
         </div>
         
         <div className="flex flex-wrap gap-1 mb-2">
@@ -115,7 +132,7 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
             <Badge 
               key={trait} 
               variant="secondary" 
-              className="text-xs px-2 py-0.5 bg-closetx-beige text-closetx-charcoal"
+              className="text-xs px-2 py-0.5 bg-closetx-beige text-closetx-charcoal hover:bg-closetx-teal/20 transition-colors"
             >
               {trait}
             </Badge>
@@ -130,6 +147,7 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
               readOnly={false} 
               onRatingChange={handleRating} 
               size={18} 
+              animated={true}
             />
           </div>
         )}

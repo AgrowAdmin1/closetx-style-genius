@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,7 @@ type StarRatingProps = {
   className?: string;
   onRatingChange?: (newRating: number) => void;
   readOnly?: boolean;
+  animated?: boolean;
 };
 
 const StarRating: React.FC<StarRatingProps> = ({
@@ -18,30 +19,39 @@ const StarRating: React.FC<StarRatingProps> = ({
   size = 16,
   className,
   onRatingChange,
-  readOnly = true
+  readOnly = true,
+  animated = false
 }) => {
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
+  
   const renderStars = () => {
     const stars = [];
     
     for (let i = 1; i <= maxRating; i++) {
-      const filled = i <= rating;
+      const filled = i <= (hoverRating !== null ? hoverRating : rating);
       stars.push(
         <button
           key={i}
           type="button"
           className={cn(
             "transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-            readOnly ? "cursor-default" : "cursor-pointer hover:scale-110"
+            readOnly ? "cursor-default" : "cursor-pointer hover:scale-110",
+            animated && "animate-scale-in",
+            animated && filled && "animate-pulse"
           )}
           onClick={() => !readOnly && onRatingChange?.(i)}
+          onMouseEnter={() => !readOnly && setHoverRating(i)}
+          onMouseLeave={() => !readOnly && setHoverRating(null)}
           disabled={readOnly}
           aria-label={`Rate ${i} out of ${maxRating}`}
+          style={{ animationDelay: `${i * 0.05}s` }}
         >
           <Star 
             size={size} 
             className={cn(
               "transition-colors",
               filled ? "fill-yellow-400 text-yellow-400" : "text-gray-300",
+              !readOnly && filled && "drop-shadow-md"
             )}
           />
         </button>
@@ -55,8 +65,11 @@ const StarRating: React.FC<StarRatingProps> = ({
     <div className={cn("flex items-center gap-0.5", className)}>
       {renderStars()}
       {!readOnly && (
-        <span className="text-xs text-gray-500 ml-2">
-          {rating}/{maxRating}
+        <span className={cn(
+          "text-xs text-gray-500 ml-2",
+          hoverRating !== null && "text-yellow-600 font-medium"
+        )}>
+          {hoverRating || rating}/{maxRating}
         </span>
       )}
     </div>
