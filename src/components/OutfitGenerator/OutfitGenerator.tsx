@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Calendar, Tag, Star, RefreshCw } from 'lucide-react';
+import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
+import StarRating from '@/components/UI/StarRating';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 type OutfitGeneratorProps = {
   wardrobe: ClothingItemType[];
@@ -16,6 +19,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
   const [formality, setFormality] = useState([50]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedOutfit, setGeneratedOutfit] = useState<ClothingItemType[] | null>(null);
+  const [styleMatchScore, setStyleMatchScore] = useState(0);
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
 
@@ -38,15 +42,25 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
       const outfit = [selectedTop, selectedBottom, selectedFootwear].filter(item => item !== null) as ClothingItemType[];
       
       setGeneratedOutfit(outfit);
+      setStyleMatchScore(3.5 + Math.random() * 1.5); // Random score between 3.5-5
       setIsGenerating(false);
     }, 1500);
   };
 
   const handleSave = () => {
     // In a real app, this would save the outfit to the user's saved outfits
+    toast.success('Outfit saved to your collection!');
     setIsOpen(false);
     // Reset for next generation
     setGeneratedOutfit(null);
+  };
+
+  const handleFeedback = (positive: boolean) => {
+    toast.success(
+      positive 
+        ? 'Thanks! This helps improve your recommendations' 
+        : 'Got it! We\'ll suggest different styles next time'
+    );
   };
 
   return (
@@ -56,13 +70,17 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
         className="bg-closetx-teal w-full hover:bg-closetx-teal/90 text-white"
       >
         <Star className="mr-2 h-5 w-5" />
-        Generate Perfect Outfit
+        Generate Your Perfect Outfit
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Generate Your Perfect Outfit</DialogTitle>
+            <DialogTitle className="flex items-center justify-center gap-2">
+              <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+              Generate Your Perfect Outfit
+              <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
@@ -124,15 +142,24 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                       Generating...
                     </>
                   ) : (
-                    "Generate Outfit"
+                    <>
+                      <Star className="mr-2 h-4 w-4 fill-yellow-400" />
+                      Generate Outfit
+                    </>
                   )}
                 </Button>
               </>
             ) : (
               <div className="space-y-4">
-                <p className="text-center font-medium text-closetx-teal">
-                  Here's your perfect outfit for {occasion}!
-                </p>
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-closetx-teal">
+                    Your perfect outfit for {occasion}!
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-500">Style Match:</span>
+                    <StarRating rating={styleMatchScore} size={14} />
+                  </div>
+                </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   {generatedOutfit.map(item => (
@@ -146,10 +173,36 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                       </div>
                       <div className="p-2">
                         <p className="text-sm font-medium truncate">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.category}</p>
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline" className="text-xs mt-1">
+                            {item.category}
+                          </Badge>
+                          <p className="text-xs text-gray-500">{item.brand}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
+                </div>
+                
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleFeedback(true)}
+                    className="flex-1"
+                  >
+                    <ThumbsUp className="h-4 w-4 mr-2" />
+                    Love it
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleFeedback(false)}
+                    className="flex-1"
+                  >
+                    <ThumbsDown className="h-4 w-4 mr-2" />
+                    Not for me
+                  </Button>
                 </div>
                 
                 <div className="flex gap-2">
@@ -165,7 +218,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                     onClick={handleSave}
                     className="flex-1 bg-closetx-teal"
                   >
-                    <Star className="mr-2 h-4 w-4" />
+                    <Star className="mr-2 h-4 w-4 fill-yellow-400" />
                     Save Outfit
                   </Button>
                 </div>

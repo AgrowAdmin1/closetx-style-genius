@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import OutfitSuggestion, { OutfitType } from '@/components/Wardrobe/OutfitSuggestion';
+import PersonalizedOutfit from '@/components/Personalization/PersonalizedOutfit';
 import AppLayout from '@/components/Layout/AppLayout';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Star, ArrowRight, Users } from 'lucide-react';
@@ -9,6 +10,7 @@ import OutfitGenerator from '@/components/OutfitGenerator/OutfitGenerator';
 import MarketplacePreview from '@/components/Marketplace/MarketplacePreview';
 import WardrobeSharing from '@/components/Sharing/WardrobeSharing';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
+import StarRating from '@/components/UI/StarRating';
 
 // Sample data
 const mockWeather = {
@@ -58,7 +60,7 @@ const mockWardrobe: ClothingItemType[] = [
 const mockOutfits: OutfitType[] = [
   {
     id: '1',
-    title: 'Today\'s Outfit',
+    title: 'Today\'s Perfect Outfit',
     occasion: 'Work Meeting',
     thumbnail: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
     items: [
@@ -131,6 +133,12 @@ const Home = () => {
   const navigate = useNavigate();
   const [events] = useState(mockEvents);
   const [outfits] = useState(mockOutfits);
+  const [personalPreferences] = useState({
+    favoriteColors: ['Blue', 'Teal', 'Beige'],
+    stylePersonality: ['Professional', 'Creative', 'Casual'],
+    recentlyWorn: ['White Shirt', 'Blue Jeans'],
+    matchScore: 4.5
+  });
 
   const formatDate = () => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -144,15 +152,26 @@ const Home = () => {
   return (
     <AppLayout weather={mockWeather}>
       <div className="mb-6">
-        <p className="text-lg font-medium text-closetx-teal">Hello, Priya!</p>
-        <p className="text-sm text-gray-600">{formatDate()}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-lg font-medium text-closetx-teal">Hello, Priya!</p>
+            <p className="text-sm text-gray-600">{formatDate()}</p>
+          </div>
+          <div className="flex items-center">
+            <StarRating rating={personalPreferences.matchScore} size={18} />
+            <span className="text-xs text-gray-500 ml-1">Style Match</span>
+          </div>
+        </div>
       </div>
 
       <section className="mb-8 animate-fade-in">
-        <h2 className="text-lg font-semibold mb-4">Today's Outfit Suggestion</h2>
-        <OutfitSuggestion 
-          outfit={outfits[0]} 
+        <h2 className="text-lg font-semibold mb-4">Today's Perfect Outfit</h2>
+        <PersonalizedOutfit 
+          outfit={outfits[0]}
+          personalityTraits={personalPreferences.stylePersonality}
+          matchScore={personalPreferences.matchScore}
           onClick={() => navigate(`/outfit/${outfits[0].id}`)}
+          className="mb-4"
         />
         <div className="mt-4">
           <OutfitGenerator wardrobe={mockWardrobe} />
