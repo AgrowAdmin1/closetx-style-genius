@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X, Check, Upload, FlipHorizontal, Zap, ZapOff } from 'lucide-react';
@@ -13,6 +12,16 @@ type CameraCaptureProps = {
 };
 
 type CameraFilter = 'normal' | 'grayscale' | 'sepia' | 'vintage';
+
+// Extended interfaces to accommodate non-standard browser features
+interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
+  advanced?: ExtendedConstraintSet[];
+}
+
+interface ExtendedConstraintSet {
+  zoom?: number;
+  torch?: boolean;
+}
 
 const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -43,13 +52,20 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
         stream.current.getTracks().forEach(track => track.stop());
       }
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+      const constraints: MediaStreamConstraints = { 
         video: { 
-          facingMode: facingMode,
-          advanced: [{ zoom: zoomLevel }] 
+          facingMode: facingMode
         },
         audio: false
-      });
+      };
+      
+      // Only try to set advanced constraints if needed
+      if (zoomLevel > 1) {
+        // Type assertion to use our extended interface
+        (constraints.video as ExtendedMediaTrackConstraints).advanced = [{ zoom: zoomLevel }];
+      }
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       
       stream.current = mediaStream;
       
@@ -61,9 +77,18 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
       // Try to enable flash if requested
       if (flashEnabled) {
         const track = mediaStream.getVideoTracks()[0];
-        if (track && track.getCapabilities && track.getCapabilities().torch) {
-          await track.applyConstraints({ advanced: [{ torch: true }] });
-        } else {
+        try {
+          // Check if torch capability exists in a type-safe way
+          const capabilities = track.getCapabilities();
+          // @ts-ignore - TypeScript doesn't know about torch but we'll check at runtime
+          if (capabilities && capabilities.torch) {
+            // @ts-ignore - Safe to use since we checked for existence
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+          } else {
+            toast.info("Flash is not supported on this device");
+          }
+        } catch (err) {
+          console.log("Flash not supported", err);
           toast.info("Flash is not supported on this device");
         }
       }
@@ -93,9 +118,18 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
     setFlashEnabled(!flashEnabled);
     if (stream.current) {
       const track = stream.current.getVideoTracks()[0];
-      if (track && track.getCapabilities && track.getCapabilities().torch) {
-        track.applyConstraints({ advanced: [{ torch: !flashEnabled }] })
-          .catch(() => toast.error("Unable to toggle flash"));
+      try {
+        // Check if torch capability exists in a type-safe way
+        // @ts-ignore - TypeScript doesn't know about torch but we'll check at runtime
+        if (track && track.getCapabilities && track.getCapabilities().torch) {
+          // @ts-ignore - Safe to use since we checked for existence
+          track.applyConstraints({ advanced: [{ torch: !flashEnabled }] })
+            .catch(() => toast.error("Unable to toggle flash"));
+        } else {
+          toast.info("Flash is not supported on this device");
+        }
+      } catch (err) {
+        console.log("Flash not supported", err);
       }
     }
   };
