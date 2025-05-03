@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { OutfitType } from '@/components/Wardrobe/OutfitSuggestion';
 import StarRating from '@/components/UI/StarRating';
-import { User, Calendar, Tag, Heart, Share2, ThumbsUp, Baby, UserRound, Users, GlobeCopy } from 'lucide-react';
+import { User, Calendar, Tag, Heart, Share2, ThumbsUp, Baby, UserRound, Users, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -180,7 +180,7 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
         </div>
         
         <div className="flex items-center gap-1 mb-2 text-xs text-gray-500">
-          <GlobeCopy size={12} />
+          <Globe size={12} />
           <span>{culturePreference} style</span>
         </div>
         
