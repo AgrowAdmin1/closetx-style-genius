@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X, Check, Upload, FlipHorizontal, Zap, ZapOff } from 'lucide-react';
@@ -13,14 +14,10 @@ type CameraCaptureProps = {
 
 type CameraFilter = 'normal' | 'grayscale' | 'sepia' | 'vintage';
 
-// Extended interfaces to accommodate non-standard browser features
-interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
-  advanced?: ExtendedConstraintSet[];
-}
-
-interface ExtendedConstraintSet {
-  zoom?: number;
+// Fix for the TypeScript error - making our interfaces compatible with MediaTrackConstraints
+interface ExtendedCapabilities {
   torch?: boolean;
+  zoom?: number;
 }
 
 const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => {
@@ -52,6 +49,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
         stream.current.getTracks().forEach(track => track.stop());
       }
 
+      // Basic constraints that TypeScript recognizes
       const constraints: MediaStreamConstraints = { 
         video: { 
           facingMode: facingMode
@@ -59,10 +57,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
         audio: false
       };
       
-      // Only try to set advanced constraints if needed
+      // For non-standard constraints, use type assertion with any
       if (zoomLevel > 1) {
-        // Type assertion to use our extended interface
-        (constraints.video as ExtendedMediaTrackConstraints).advanced = [{ zoom: zoomLevel }];
+        const advancedConstraints = constraints.video as any;
+        if (!advancedConstraints.advanced) {
+          advancedConstraints.advanced = [];
+        }
+        advancedConstraints.advanced.push({ zoom: zoomLevel });
       }
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -78,12 +79,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
       if (flashEnabled) {
         const track = mediaStream.getVideoTracks()[0];
         try {
-          // Check if torch capability exists in a type-safe way
-          const capabilities = track.getCapabilities();
-          // @ts-ignore - TypeScript doesn't know about torch but we'll check at runtime
+          // Use any for capabilities to handle non-standard torch property
+          const capabilities = track.getCapabilities() as any;
           if (capabilities && capabilities.torch) {
-            // @ts-ignore - Safe to use since we checked for existence
-            await track.applyConstraints({ advanced: [{ torch: true }] });
+            // Apply torch constraint with type assertion
+            await track.applyConstraints({
+              advanced: [{ torch: true }] as any
+            });
           } else {
             toast.info("Flash is not supported on this device");
           }
@@ -119,12 +121,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
     if (stream.current) {
       const track = stream.current.getVideoTracks()[0];
       try {
-        // Check if torch capability exists in a type-safe way
-        // @ts-ignore - TypeScript doesn't know about torch but we'll check at runtime
-        if (track && track.getCapabilities && track.getCapabilities().torch) {
-          // @ts-ignore - Safe to use since we checked for existence
-          track.applyConstraints({ advanced: [{ torch: !flashEnabled }] })
-            .catch(() => toast.error("Unable to toggle flash"));
+        // Use any for capabilities to handle non-standard torch property
+        const capabilities = track.getCapabilities() as any;
+        if (capabilities && capabilities.torch) {
+          // Apply torch constraint with type assertion
+          track.applyConstraints({
+            advanced: [{ torch: !flashEnabled }] as any
+          }).catch(() => toast.error("Unable to toggle flash"));
         } else {
           toast.info("Flash is not supported on this device");
         }
