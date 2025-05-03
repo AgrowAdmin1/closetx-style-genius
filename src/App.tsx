@@ -16,6 +16,8 @@ import OutfitPost from "./pages/OutfitPost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ItemDetail from "./pages/ItemDetail";
+import Chat from "./pages/Chat";
+import ChatOverview from "./pages/ChatOverview";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,6 +46,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/item/:itemId" element={<ItemDetail />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:chatId" element={<Chat />} />
+          <Route path="/chat-overview" element={<ChatOverview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -3,10 +3,18 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, MessageCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
-const Header = () => {
+interface HeaderProps {
+  weather?: {
+    temp: number;
+    condition: string;
+  }
+}
+
+const Header: React.FC<HeaderProps> = ({ weather }) => {
   const navigate = useNavigate();
   
   return (
@@ -15,6 +23,13 @@ const Header = () => {
         <Link to="/">
           <span className="font-bold text-xl text-closetx-teal">ClosetX</span>
         </Link>
+        
+        {weather && (
+          <div className="hidden md:flex items-center text-sm bg-gray-50 px-2 py-1 rounded-full ml-2">
+            <span className="font-medium">{weather.temp}°</span>
+            <span className="ml-1 text-gray-500">{weather.condition}</span>
+          </div>
+        )}
       </div>
       
       <div className="flex items-center space-x-4">
@@ -26,6 +41,19 @@ const Header = () => {
         >
           <Search className="h-4 w-4" />
           <span className="sr-only">Search</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full relative"
+          onClick={() => navigate('/chat-overview')}
+        >
+          <MessageCircle className="h-4 w-4" />
+          <span className="sr-only">Messages</span>
+          <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-closetx-teal">
+            3
+          </Badge>
         </Button>
         
         <Button 
