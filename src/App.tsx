@@ -13,8 +13,18 @@ import NotFound from "./pages/NotFound";
 import OutfitGenerator from "./pages/OutfitGenerator";
 import Marketplace from "./pages/Marketplace";
 import OutfitPost from "./pages/OutfitPost";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ItemDetail from "./pages/ItemDetail";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,6 +41,9 @@ const App = () => (
           <Route path="/outfit-generator" element={<OutfitGenerator />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/post/:postId" element={<OutfitPost />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/item/:itemId" element={<ItemDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
