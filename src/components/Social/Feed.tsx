@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FeedPost, { FeedPostType } from './FeedPost';
 import { CommentType } from './SocialActions';
+import { ClothingCondition } from '@/components/Collection/ItemStatus';
 
 // Mock data for feed posts
 const mockPosts: FeedPostType[] = [
@@ -14,6 +16,7 @@ const mockPosts: FeedPostType[] = [
     timestamp: '2025-05-02T11:30:00.000Z',
     location: 'Mumbai',
     likes: 24,
+    zone: 'Trending',
     comments: [
       {
         id: 'c1',
@@ -34,17 +37,34 @@ const mockPosts: FeedPostType[] = [
       {
         id: 'od1',
         name: 'Navy Blazer',
-        brand: 'Zara'
+        brand: 'Zara',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: true,
+          lastWorn: 'Yesterday'
+        }
       },
       {
         id: 'od2',
         name: 'White Button-up',
-        brand: 'H&M'
+        brand: 'H&M',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: false
+        }
       },
       {
         id: 'od3',
         name: 'Tailored Trousers',
-        brand: 'Mango'
+        brand: 'Mango',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: true,
+          lastWorn: '1 week ago'
+        }
       }
     ]
   },
@@ -70,17 +90,34 @@ const mockPosts: FeedPostType[] = [
       {
         id: 'od4',
         name: 'Floral Midi Dress',
-        brand: 'Forever 21'
+        brand: 'Forever 21',
+        condition: {
+          isClean: true,
+          isIroned: false,
+          isUsed: false
+        }
       },
       {
         id: 'od5',
         name: 'Straw Hat',
-        brand: 'Urban Outfitters'
+        brand: 'Urban Outfitters',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: true,
+          lastWorn: '3 days ago'
+        }
       },
       {
         id: 'od6',
         name: 'Leather Sandals',
-        brand: 'Aldo'
+        brand: 'Aldo',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: true,
+          lastWorn: 'Today'
+        }
       }
     ]
   },
@@ -92,22 +129,40 @@ const mockPosts: FeedPostType[] = [
     caption: 'Date night ready! What do you think of this look? #datenight #ootd',
     timestamp: '2025-05-01T19:30:00.000Z',
     likes: 42,
+    zone: 'Local',
     comments: [],
     outfitDetails: [
       {
         id: 'od7',
         name: 'Black Dress',
-        brand: 'Zara'
+        brand: 'Zara',
+        condition: {
+          isClean: false,
+          isIroned: false,
+          isUsed: true,
+          lastWorn: 'Yesterday'
+        }
       },
       {
         id: 'od8',
         name: 'Statement Earrings',
-        brand: 'H&M'
+        brand: 'H&M',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: true,
+          lastWorn: '1 week ago'
+        }
       },
       {
         id: 'od9',
         name: 'Leather Clutch',
-        brand: 'Mango'
+        brand: 'Mango',
+        condition: {
+          isClean: true,
+          isIroned: true,
+          isUsed: false
+        }
       }
     ]
   }
@@ -118,10 +173,11 @@ interface FeedProps {
 }
 
 const Feed: React.FC<FeedProps> = ({ className }) => {
-  const [posts, setPosts] = useState<FeedPostType[]>(mockPosts);
+  const [posts] = useState<FeedPostType[]>(mockPosts);
+  const navigate = useNavigate();
   
   const handlePostClick = (postId: string) => {
-    console.log(`Clicked on post ${postId}`);
+    navigate(`/post/${postId}`);
   };
 
   return (

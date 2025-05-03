@@ -5,6 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import SocialActions, { CommentType } from './SocialActions';
+import { ClothingCondition } from '@/components/Collection/ItemStatus';
+import { Badge } from '@/components/ui/badge';
+import { Droplets, Wind } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export type FeedPostType = {
   id: string;
@@ -21,7 +25,9 @@ export type FeedPostType = {
     id: string;
     name: string;
     brand: string;
+    condition?: ClothingCondition;
   }>;
+  zone?: string;
 };
 
 interface FeedPostProps {
@@ -78,6 +84,12 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
           alt={`${post.userName}'s post`} 
           className="w-full h-full object-cover"
         />
+        
+        {post.zone && (
+          <Badge className="absolute top-3 right-3 bg-closetx-teal/90">
+            {post.zone} Zone
+          </Badge>
+        )}
       </div>
       
       <CardContent className="p-4">
@@ -102,11 +114,45 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
       
       {post.outfitDetails && post.outfitDetails.length > 0 && (
         <CardFooter className="px-4 py-3 border-t text-xs border-gray-100">
-          <div>
+          <div className="w-full">
             <p className="font-medium text-xs mb-1">Outfit Details</p>
-            <div className="space-y-0.5">
+            <div className="space-y-2">
               {post.outfitDetails.map(item => (
-                <p key={item.id}>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
+                <div key={item.id} className="flex justify-between items-center">
+                  <p>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
+                  
+                  {item.condition && (
+                    <TooltipProvider>
+                      <div className="flex items-center gap-1">
+                        {!item.condition.isClean && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center">
+                                <Droplets size={12} />
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Needs washing</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        
+                        {!item.condition.isIroned && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="secondary" className="h-5 w-5 p-0 flex items-center justify-center">
+                                <Wind size={12} />
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Needs ironing</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TooltipProvider>
+                  )}
+                </div>
               ))}
             </div>
           </div>

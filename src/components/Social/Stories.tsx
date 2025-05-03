@@ -1,11 +1,14 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
+import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Camera, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ClothingCondition } from '@/components/Collection/ItemStatus';
 
 type StoryItem = {
   id: string;
@@ -14,6 +17,11 @@ type StoryItem = {
   imageUrl: string;
   createdAt: string;
   isViewed: boolean;
+  zone?: string;
+  outfitCondition?: {
+    needsWashing: boolean;
+    needsIroning: boolean;
+  };
 };
 
 const mockStories: StoryItem[] = [
@@ -24,6 +32,11 @@ const mockStories: StoryItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
     createdAt: '2025-05-02T10:00:00.000Z',
     isViewed: false,
+    zone: 'Mumbai',
+    outfitCondition: {
+      needsWashing: false,
+      needsIroning: false
+    }
   },
   {
     id: '2',
@@ -32,6 +45,11 @@ const mockStories: StoryItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1554412933-514a83d2f3c8',
     createdAt: '2025-05-02T09:30:00.000Z',
     isViewed: false,
+    zone: 'Delhi',
+    outfitCondition: {
+      needsWashing: true,
+      needsIroning: false
+    }
   },
   {
     id: '3',
@@ -40,6 +58,11 @@ const mockStories: StoryItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b',
     createdAt: '2025-05-02T08:45:00.000Z',
     isViewed: false,
+    zone: 'Bangalore',
+    outfitCondition: {
+      needsWashing: false,
+      needsIroning: true
+    }
   },
   {
     id: '4',
@@ -48,6 +71,11 @@ const mockStories: StoryItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
     createdAt: '2025-05-01T22:15:00.000Z',
     isViewed: false,
+    zone: 'Chennai',
+    outfitCondition: {
+      needsWashing: true,
+      needsIroning: true
+    }
   },
   {
     id: '5',
@@ -56,6 +84,7 @@ const mockStories: StoryItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1554412933-514a83d2f3c8',
     createdAt: '2025-05-01T20:30:00.000Z',
     isViewed: false,
+    zone: 'Hyderabad'
   },
 ];
 
@@ -140,9 +169,43 @@ const Stories: React.FC<StoriesProps> = ({ className, onCreateStory }) => {
               </Avatar>
               <div className="ml-2 text-white">
                 <p className="font-medium">{activeStory.userName}</p>
-                <p className="text-xs opacity-80">{formatStoryTime(activeStory.createdAt)}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs opacity-80">{formatStoryTime(activeStory.createdAt)}</p>
+                  {activeStory.zone && (
+                    <Badge className="bg-closetx-teal/90 text-[10px] h-4">{activeStory.zone}</Badge>
+                  )}
+                </div>
               </div>
             </div>
+            
+            {activeStory.outfitCondition && (
+              <div className="absolute top-4 right-4 flex gap-1">
+                <TooltipProvider>
+                  {activeStory.outfitCondition.needsWashing && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="destructive" className="bg-opacity-80">Needs Washing</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>This outfit needs to be washed</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {activeStory.outfitCondition.needsIroning && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="secondary" className="bg-opacity-80">Needs Ironing</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>This outfit needs to be ironed</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
+              </div>
+            )}
+            
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
               <p className="text-white text-sm">Tap to view next story</p>
             </div>
@@ -209,8 +272,23 @@ const Stories: React.FC<StoriesProps> = ({ className, onCreateStory }) => {
                   </Avatar>
                 </div>
                 
+                {/* Status Indicators */}
+                {story.outfitCondition && (
+                  <div className="absolute top-14 left-1/2 -translate-x-1/2 flex gap-0.5">
+                    {story.outfitCondition.needsWashing && (
+                      <Badge variant="destructive" className="h-1.5 w-1.5 rounded-full p-0"></Badge>
+                    )}
+                    {story.outfitCondition.needsIroning && (
+                      <Badge variant="secondary" className="h-1.5 w-1.5 rounded-full p-0"></Badge>
+                    )}
+                  </div>
+                )}
+                
                 <div className="absolute bottom-1 left-0 right-0 text-center">
                   <p className="text-white text-xs font-medium">{story.userName}</p>
+                  {story.zone && (
+                    <p className="text-white/70 text-[10px]">{story.zone}</p>
+                  )}
                 </div>
               </div>
             </Card>
