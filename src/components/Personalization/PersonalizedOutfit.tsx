@@ -4,10 +4,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { OutfitType } from '@/components/Wardrobe/OutfitSuggestion';
 import StarRating from '@/components/UI/StarRating';
-import { User, Calendar, Tag, Heart, Share2, ThumbsUp } from 'lucide-react';
+import { User, Calendar, Tag, Heart, Share2, ThumbsUp, Baby, UserRound, Users, GlobeCopy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+type AgeGroup = 'Gen Z' | 'Millennial' | 'Gen Alpha' | 'Gen Beta';
+type Gender = 'Men' | 'Women' | 'Boys' | 'Girls' | 'Unisex';
+type CulturePreference = 'Western' | 'Eastern' | 'Global' | 'Fusion' | 'Traditional' | 'Modern';
 
 interface PersonalizedOutfitProps {
   outfit: OutfitType;
@@ -16,6 +20,9 @@ interface PersonalizedOutfitProps {
   matchScore?: number;
   onClick?: () => void;
   className?: string;
+  ageGroup?: AgeGroup;
+  gender?: Gender;
+  culturePreference?: CulturePreference;
 }
 
 // Natural outfit image URLs
@@ -28,13 +35,31 @@ const naturalOutfitImages = [
   "https://images.unsplash.com/photo-1596609548086-85bbf8ddb6b9"
 ];
 
+const ageGroupColors = {
+  'Gen Z': 'bg-purple-100 text-purple-800',
+  'Millennial': 'bg-blue-100 text-blue-800',
+  'Gen Alpha': 'bg-green-100 text-green-800',
+  'Gen Beta': 'bg-amber-100 text-amber-800',
+};
+
+const genderIcons = {
+  'Men': UserRound,
+  'Women': UserRound, 
+  'Boys': Baby,
+  'Girls': Baby,
+  'Unisex': Users
+};
+
 const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
   outfit,
   userName = 'Priya',
   personalityTraits = ['Creative', 'Professional', 'Trendy'],
   matchScore = 4.5,
   onClick,
-  className
+  className,
+  ageGroup = 'Gen Z',
+  gender = 'Women',
+  culturePreference = 'Global'
 }) => {
   const [liked, setLiked] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
@@ -61,6 +86,12 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
     setUserRating(rating);
     toast.success(`You rated this outfit ${rating} stars!`);
   };
+
+  // Get the appropriate icon for the gender
+  const GenderIcon = genderIcons[gender] || User;
+  
+  // Get age group color class
+  const ageGroupColorClass = ageGroupColors[ageGroup] || 'bg-gray-100 text-gray-800';
 
   return (
     <Card 
@@ -105,17 +136,26 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
           <h3 className="text-white font-medium">{outfit.title}</h3>
           <div className="flex items-center gap-2 text-white/90 text-xs">
-            <User size={12} /> 
-            <span>Perfect for {userName}'s style</span>
+            <GenderIcon size={12} /> 
+            <span>Perfect for {gender} • {ageGroup}</span>
           </div>
         </div>
         
-        <Badge 
-          variant="outline" 
-          className="absolute top-3 left-3 bg-white/90 text-closetx-teal"
-        >
-          {outfit.occasion}
-        </Badge>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+          <Badge 
+            variant="outline" 
+            className="bg-white/90 text-closetx-teal"
+          >
+            {outfit.occasion}
+          </Badge>
+          
+          <Badge 
+            variant="outline" 
+            className={cn("text-xs", ageGroupColorClass)}
+          >
+            {ageGroup}
+          </Badge>
+        </div>
       </div>
       
       <CardContent className="p-3">
@@ -137,6 +177,11 @@ const PersonalizedOutfit: React.FC<PersonalizedOutfitProps> = ({
               {trait}
             </Badge>
           ))}
+        </div>
+        
+        <div className="flex items-center gap-1 mb-2 text-xs text-gray-500">
+          <GlobeCopy size={12} />
+          <span>{culturePreference} style</span>
         </div>
         
         {!userRating && (
