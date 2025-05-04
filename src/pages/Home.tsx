@@ -1,10 +1,35 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Feed from '@/components/Social/Feed';
+import Stories from '@/components/Social/Stories';
+import AppLayout from '@/components/Layout/AppLayout';
 
 const Home = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+  
+  // Simulate authentication check
+  useEffect(() => {
+    // For demo purposes, we'll check localStorage
+    const hasLoggedIn = localStorage.getItem('isLoggedIn');
+    setIsAuthenticated(!!hasLoggedIn);
+  }, []);
+
+  // Show authenticated home page with feed and stories
+  if (isAuthenticated) {
+    return (
+      <AppLayout weather={{ temp: 28, condition: 'Sunny' }}>
+        <div className="flex flex-col gap-4 pb-16 pt-4">
+          <Stories className="px-4" />
+          <Feed className="px-4" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show landing page for non-authenticated users
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}

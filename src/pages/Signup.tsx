@@ -51,8 +51,11 @@ const Signup = () => {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // For demo purposes, store authentication state in localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      
       toast.success('Account created successfully!');
-      navigate('/wardrobe');
+      navigate('/');
     } catch (error) {
       console.error('Signup error:', error);
       toast.error('Failed to create account. Please try again.');

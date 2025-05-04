@@ -31,9 +31,12 @@ const Login = () => {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // For demo purposes, store authentication state in localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      
       // For demo purposes, any login works
       toast.success('Login successful!');
-      navigate('/wardrobe');
+      navigate('/');
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed. Please check your credentials.');
