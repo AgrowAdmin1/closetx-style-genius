@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ClothingItemType } from './ClothingItem';
 import { Badge } from '@/components/ui/badge';
-import { Shirt, Eye, Gem, Watch, Brush } from 'lucide-react';
+import { Shirt, Eye, Gem, Watch, Brush, Sunglasses, Palette, Scissors, Nail } from 'lucide-react';
 
 export type StyleItemType = {
   id: string;
@@ -35,28 +35,42 @@ export type OutfitType = {
 type OutfitSuggestionProps = {
   outfit: OutfitType;
   onClick?: () => void;
+  showFullDetails?: boolean;
 };
 
-const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) => {
+const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ 
+  outfit, 
+  onClick, 
+  showFullDetails = false 
+}) => {
   // Helper function to get the appropriate icon based on category
   const getCategoryIcon = (category: string) => {
     switch (category.toLowerCase()) {
       case 'eyewear':
-        return <Eye className="h-4 w-4 text-gray-500" />;
+      case 'glasses':
+      case 'sunglasses':
+        return <Sunglasses className="h-4 w-4 text-gray-500" />;
       case 'jewelry':
       case 'ring':
         return <Gem className="h-4 w-4 text-gray-500" />;
       case 'necklace':
       case 'watch':
+      case 'bracelet':
         return <Watch className="h-4 w-4 text-gray-500" />;
       case 'makeup':
       case 'lipstick':
-        return <Brush className="h-4 w-4 text-gray-500" />;
+        return <Palette className="h-4 w-4 text-gray-500" />;
       case 'footwear':
       case 'shoe':
+      case 'shoes':
+      case 'boots':
         return <Shirt className="h-4 w-4 text-gray-500" />;
       case 'hairstyle':
-        return <Brush className="h-4 w-4 text-gray-500" />;
+      case 'hair':
+        return <Scissors className="h-4 w-4 text-gray-500" />;
+      case 'nails':
+      case 'nail polish':
+        return <Nail className="h-4 w-4 text-gray-500" />;
       default:
         return <Shirt className="h-4 w-4 text-gray-500" />;
     }
@@ -68,8 +82,8 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) 
 
   return (
     <Card 
-      className="closetx-card overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-      onClick={onClick}
+      className={`closetx-card overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${showFullDetails ? '' : 'cursor-pointer'}`}
+      onClick={!showFullDetails && onClick ? onClick : undefined}
     >
       <div className="relative">
         <div className="aspect-[4/3] overflow-hidden">
@@ -92,7 +106,7 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) 
       </div>
       
       <div className="p-3 space-y-2">
-        <div className="flex overflow-x-auto gap-2 pb-2">
+        <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
           {outfit.items.map((item) => (
             <div key={item.id} className="w-10 h-10 flex-shrink-0">
               <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-md" />
@@ -150,8 +164,99 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) 
         )}
         
         {outfit.designerNotes && (
-          <div className="text-xs italic text-gray-500">
+          <div className="text-xs italic text-gray-500 mt-2">
             "{outfit.designerNotes}"
+          </div>
+        )}
+        
+        {showFullDetails && hasExtraElements && (
+          <div className="mt-4 border-t pt-4">
+            <h4 className="font-medium text-sm mb-3">Full Styling Details</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {outfit.styleElements?.hairstyle && (
+                <div className="border rounded-md overflow-hidden">
+                  <div className="aspect-square">
+                    <img 
+                      src={outfit.styleElements.hairstyle.image}
+                      alt={outfit.styleElements.hairstyle.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="font-medium text-xs">{outfit.styleElements.hairstyle.name}</p>
+                    <Badge variant="outline" className="text-xs mt-1">Hairstyle</Badge>
+                  </div>
+                </div>
+              )}
+              
+              {outfit.styleElements?.makeup && (
+                <div className="border rounded-md overflow-hidden">
+                  <div className="aspect-square">
+                    <img 
+                      src={outfit.styleElements.makeup.image}
+                      alt={outfit.styleElements.makeup.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="font-medium text-xs">{outfit.styleElements.makeup.name}</p>
+                    <Badge variant="outline" className="text-xs mt-1">Makeup</Badge>
+                  </div>
+                </div>
+              )}
+              
+              {outfit.styleElements?.eyewear && (
+                <div className="border rounded-md overflow-hidden">
+                  <div className="aspect-square">
+                    <img 
+                      src={outfit.styleElements.eyewear.image}
+                      alt={outfit.styleElements.eyewear.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="font-medium text-xs">{outfit.styleElements.eyewear.name}</p>
+                    <Badge variant="outline" className="text-xs mt-1">Eyewear</Badge>
+                  </div>
+                </div>
+              )}
+              
+              {outfit.styleElements?.nails && (
+                <div className="border rounded-md overflow-hidden">
+                  <div className="aspect-square">
+                    <img 
+                      src={outfit.styleElements.nails.image}
+                      alt={outfit.styleElements.nails.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="font-medium text-xs">{outfit.styleElements.nails.name}</p>
+                    <Badge variant="outline" className="text-xs mt-1">Nails</Badge>
+                  </div>
+                </div>
+              )}
+              
+              {outfit.styleElements?.jewelry && outfit.styleElements.jewelry.map((item) => (
+                <div key={item.id} className="border rounded-md overflow-hidden">
+                  <div className="aspect-square">
+                    <img 
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="font-medium text-xs">{item.name}</p>
+                    <div className="flex justify-between items-center mt-1">
+                      <Badge variant="outline" className="text-xs">Jewelry</Badge>
+                      {item.brand && <span className="text-[10px] text-gray-500">{item.brand}</span>}
+                    </div>
+                    {item.price && <p className="text-[11px] mt-1 font-medium">{item.price}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

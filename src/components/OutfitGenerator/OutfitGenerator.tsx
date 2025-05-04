@@ -7,6 +7,7 @@ import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { OutfitType, StyleItemType } from '../Wardrobe/OutfitSuggestion';
 
 type OutfitGeneratorProps = {
   wardrobe: ClothingItemType[];
@@ -66,8 +67,21 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedOutfit, setGeneratedOutfit] = useState<ClothingItemType[] | null>(null);
   const [styleMatchScore, setStyleMatchScore] = useState(0);
+  const [designerMode, setDesignerMode] = useState(false);
+  const [celebrityInspiration, setCelebrityInspiration] = useState<string | null>(null);
+  const [styleElements, setStyleElements] = useState<Record<string, any> | null>(null);
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
+
+  // Celebrity inspirations for different occasions
+  const celebrityInspirations = {
+    casual: ['Jennifer Aniston', 'Zendaya', 'Ryan Reynolds', 'Timothée Chalamet'],
+    formal: ['Blake Lively', 'Cate Blanchett', 'Michael B. Jordan', 'Tom Ford'],
+    work: ['Amal Clooney', 'Victoria Beckham', 'David Beckham', 'Ryan Gosling'],
+    date: ['Emily Ratajkowski', 'Margot Robbie', 'Harry Styles', 'Chris Hemsworth'],
+    party: ['Rihanna', 'Dua Lipa', 'A$AP Rocky', 'Bad Bunny'],
+    workout: ['Dua Lipa', 'Kendall Jenner', 'Chris Hemsworth', 'The Rock']
+  };
 
   const generateOutfit = () => {
     setIsGenerating(true);
@@ -251,8 +265,36 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
         }
       }
       
+      // Add styling elements if designer mode is enabled
+      if (designerMode) {
+        // Generate random celebrity inspiration
+        const occasionCelebs = celebrityInspirations[occasion as keyof typeof celebrityInspirations] || [];
+        if (occasionCelebs.length > 0) {
+          setCelebrityInspiration(occasionCelebs[Math.floor(Math.random() * occasionCelebs.length)]);
+        }
+        
+        // Generate styling elements like hairstyle, makeup, etc.
+        setStyleElements({
+          hairstyle: {
+            name: occasion === 'formal' ? 'Elegant Updo' : 'Casual Waves',
+            image: getRealisticImage('hairstyle')
+          },
+          makeup: {
+            name: occasion === 'formal' ? 'Evening Glam' : 'Natural Look',
+            image: getRealisticImage('makeup')
+          },
+          jewelry: [
+            {
+              name: 'Statement Necklace',
+              image: getRealisticImage('jewelry')
+            }
+          ]
+        });
+      }
+      
       setGeneratedOutfit(outfit);
       setStyleMatchScore(4 + Math.random()); // Random score between 4-5 for better user experience
+      
       setIsGenerating(false);
     }, 1500);
   };
@@ -271,6 +313,11 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
         ? 'Thanks! This helps improve your recommendations' 
         : 'Got it! We\'ll suggest different styles next time'
     );
+  };
+
+  const toggleDesignerMode = () => {
+    setDesignerMode(!designerMode);
+    toast.success(designerMode ? 'Designer mode disabled' : 'Celebrity stylist mode enabled!');
   };
 
   return (
@@ -339,6 +386,34 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                       defaultValue={new Date().toISOString().split('T')[0]}
                     />
                   </div>
+                  
+                  <div className="flex items-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleDesignerMode}
+                      className={`flex-1 ${designerMode ? 'bg-closetx-teal/10 border-closetx-teal text-closetx-teal' : ''}`}
+                    >
+                      <Star className="mr-2 h-4 w-4" fill={designerMode ? "currentColor" : "none"} />
+                      Celebrity Stylist Mode
+                    </Button>
+                  </div>
+                  
+                  {designerMode && (
+                    <div className="border-t pt-3">
+                      <p className="text-xs text-gray-500 mb-2">
+                        Get complete styling suggestions inspired by celebrities!
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(celebrityInspirations).map(([key, celebrities]) => (
+                          <div key={key} className="text-xs">
+                            <span className="font-medium capitalize">{key}:</span>
+                            <span className="text-gray-500"> {celebrities[0]}, {celebrities[1]}...</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <Button
@@ -354,13 +429,24 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   ) : (
                     <>
                       <Star className="mr-2 h-4 w-4 fill-yellow-400" />
-                      Generate Outfit
+                      Generate {designerMode ? "Celebrity Look" : "Outfit"}
                     </>
                   )}
                 </Button>
               </>
             ) : (
-              <div className="space-y-4">
+              // ... keep existing code (outfit display, styling elements, feedback buttons)
+              <div>
+                {/* Display celebrity inspiration if available */}
+                {designerMode && celebrityInspiration && (
+                  <div className="mb-4 bg-gradient-to-r from-closetx-teal/20 to-purple-100 p-3 rounded-lg">
+                    <p className="text-sm font-medium flex items-center">
+                      <Star className="h-4 w-4 mr-2 fill-yellow-400" />
+                      Inspired by {celebrityInspiration}
+                    </p>
+                  </div>
+                )}
+                
                 <div className="flex justify-between items-center">
                   <p className="font-medium text-closetx-teal">
                     Your perfect outfit for {occasion}!
