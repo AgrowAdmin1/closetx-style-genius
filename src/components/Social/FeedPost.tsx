@@ -1,14 +1,27 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ShoppingCart, Tag, Star, TrendingUp, MessageSquare } from 'lucide-react';
 import SocialActions, { CommentType } from './SocialActions';
 import { ClothingCondition } from '@/components/Collection/ItemStatus';
 import { Badge } from '@/components/ui/badge';
 import { Droplets, Wind } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
+
+export type ClothingItemDetail = {
+  id: string;
+  name: string;
+  brand: string;
+  price?: string;
+  condition?: ClothingCondition;
+  trend?: 'rising' | 'stable' | 'falling';
+  rating?: number;
+  reviewCount?: number;
+  coordinates?: { x1: number; y1: number; x2: number; y2: number };
+};
 
 export type FeedPostType = {
   id: string;
@@ -21,12 +34,7 @@ export type FeedPostType = {
   likes: number;
   comments: CommentType[];
   saved?: boolean;
-  outfitDetails?: Array<{
-    id: string;
-    name: string;
-    brand: string;
-    condition?: ClothingCondition;
-  }>;
+  outfitDetails?: ClothingItemDetail[];
   zone?: string;
 };
 
@@ -37,6 +45,8 @@ interface FeedPostProps {
 }
 
 const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => {
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  
   const formatPostTime = (dateString: string) => {
     const postDate = new Date(dateString);
     const now = new Date();
@@ -50,6 +60,13 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
       return `${diffHrs} hours ago`;
     } else {
       return `${Math.floor(diffHrs / 24)} days ago`;
+    }
+  };
+  
+  const handleAddToCart = (itemId: string) => {
+    const item = post.outfitDetails?.find(item => item.id === itemId);
+    if (item) {
+      toast.success(`Added ${item.name} to cart`);
     }
   };
 
@@ -76,7 +93,7 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
       </CardHeader>
       
       <div 
-        className="aspect-square overflow-hidden cursor-pointer"
+        className="aspect-square overflow-hidden cursor-pointer relative"
         onClick={() => onPostClick && onPostClick(post.id)}
       >
         <img 
@@ -90,6 +107,53 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
             {post.zone} Zone
           </Badge>
         )}
+        
+        {post.outfitDetails?.map(item => (
+          item.coordinates && (
+            <div 
+              key={item.id}
+              className="absolute border-2 border-closetx-teal/60 cursor-pointer transition-all duration-300 hover:bg-closetx-teal/20"
+              style={{ 
+                top: `${item.coordinates.y1}%`, 
+                left: `${item.coordinates.x1}%`, 
+                width: `${item.coordinates.x2 - item.coordinates.x1}%`, 
+                height: `${item.coordinates.y2 - item.coordinates.y1}%`,
+                opacity: hoveredItem === item.id ? 1 : 0.3,
+              }}
+              onMouseEnter={() => setHoveredItem(item.id)}
+              onMouseLeave={() => setHoveredItem(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.info(`Viewing ${item.name} details`);
+              }}
+            >
+              {hoveredItem === item.id && (
+                <div className="absolute -top-16 left-0 bg-white p-2 rounded-md shadow-md z-10 min-w-[150px]">
+                  <p className="font-medium text-xs">{item.name}</p>
+                  <p className="text-xs text-gray-700">{item.brand}</p>
+                  {item.price && <p className="text-xs font-semibold">{item.price}</p>}
+                  {item.rating && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star size={12} className="text-amber-500 fill-amber-500" />
+                      <span className="text-xs">{item.rating} ({item.reviewCount || 0})</span>
+                    </div>
+                  )}
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    className="w-full mt-1 h-6 text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(item.id);
+                    }}
+                  >
+                    <ShoppingCart size={10} className="mr-1" /> Add to Cart
+                  </Button>
+                </div>
+              )}
+            </div>
+          )
+        ))}
       </div>
       
       <CardContent className="p-4">
@@ -119,7 +183,29 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
             <div className="space-y-2">
               {post.outfitDetails.map(item => (
                 <div key={item.id} className="flex justify-between items-center">
-                  <p>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
+                  <div className="flex items-center gap-2">
+                    <p>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
+                    {item.trend && (
+                      <TrendingUp size={12} className={item.trend === 'rising' ? 'text-green-500' : 'text-gray-400'} />
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {item.price && (
+                      <Badge variant="outline" className="text-xs font-medium">
+                        {item.price}
+                      </Badge>
+                    )}
+                    
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-6 text-xs"
+                      onClick={() => handleAddToCart(item.id)}
+                    >
+                      <ShoppingCart size={12} className="mr-1" /> Add
+                    </Button>
+                  </div>
                   
                   {item.condition && (
                     <TooltipProvider>
