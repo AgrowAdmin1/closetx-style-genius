@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -586,4 +587,296 @@ const OutfitGenerator = () => {
           >
             {isGenerating ? (
               <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin"
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Star className="mr-2 h-4 w-4 fill-yellow-400" />
+                Generate Outfit
+              </>
+            )}
+          </Button>
+          
+          {currentOutfit && (
+            <div className="mt-6 space-y-6">
+              <div className="border-t pt-6 flex items-center justify-between">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={outfitName}
+                    onChange={(e) => setOutfitName(e.target.value)}
+                    className="text-xl font-bold bg-transparent border-b border-dashed border-gray-300 w-full focus:outline-none focus:border-closetx-teal"
+                    placeholder="Name your outfit"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    {currentOutfit.items.length} items • {currentOutfit.occasion}
+                  </p>
+                </div>
+                
+                <Button onClick={saveOutfit} className="bg-closetx-teal">
+                  <Save className="mr-2 h-4 w-4" />
+                  Save
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {currentOutfit.items.map(item => (
+                  <div key={item.id} className="border rounded-lg overflow-hidden">
+                    <div className="aspect-square">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-2">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs mt-1">
+                          {item.category}
+                        </Badge>
+                        {item.brand && (
+                          <p className="text-xs text-gray-500">{item.brand}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {designerMode && currentOutfit.styleElements && (
+                <div>
+                  <h3 className="font-medium text-lg mb-2 flex items-center">
+                    <Star size={16} className="mr-2 text-yellow-400 fill-yellow-400" />
+                    Styling Elements
+                  </h3>
+                  
+                  <Tabs defaultValue="hair" className="w-full">
+                    <TabsList className="w-full flex overflow-x-auto">
+                      {currentOutfit.styleElements.hairstyle && (
+                        <TabsTrigger value="hair" className="flex-1">Hairstyle</TabsTrigger>
+                      )}
+                      {currentOutfit.styleElements.makeup && (
+                        <TabsTrigger value="makeup" className="flex-1">Makeup</TabsTrigger>
+                      )}
+                      {currentOutfit.styleElements.jewelry && (
+                        <TabsTrigger value="jewelry" className="flex-1">Jewelry</TabsTrigger>
+                      )}
+                      {currentOutfit.styleElements.eyewear && (
+                        <TabsTrigger value="eyewear" className="flex-1">Eyewear</TabsTrigger>
+                      )}
+                      {currentOutfit.styleElements.nails && (
+                        <TabsTrigger value="nails" className="flex-1">Nails</TabsTrigger>
+                      )}
+                    </TabsList>
+                    
+                    {currentOutfit.styleElements.hairstyle && (
+                      <TabsContent value="hair" className="mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="aspect-square rounded-lg overflow-hidden">
+                            <img 
+                              src={currentOutfit.styleElements.hairstyle.image} 
+                              alt={currentOutfit.styleElements.hairstyle.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <h4 className="font-medium text-lg">{currentOutfit.styleElements.hairstyle.name}</h4>
+                            <p className="text-sm text-gray-600 mt-2">
+                              This hairstyle complements the outfit's {occasion} vibe while framing your face beautifully.
+                            </p>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    )}
+                    
+                    {currentOutfit.styleElements.makeup && (
+                      <TabsContent value="makeup" className="mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="aspect-square rounded-lg overflow-hidden">
+                            <img 
+                              src={currentOutfit.styleElements.makeup.image} 
+                              alt={currentOutfit.styleElements.makeup.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <h4 className="font-medium text-lg">{currentOutfit.styleElements.makeup.name}</h4>
+                            <p className="text-sm text-gray-600 mt-2">
+                              This makeup look enhances your natural features while perfectly complementing your outfit choice.
+                            </p>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    )}
+                    
+                    {currentOutfit.styleElements.jewelry && (
+                      <TabsContent value="jewelry" className="mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {currentOutfit.styleElements.jewelry.map((item) => (
+                            <div key={item.id} className="border rounded-lg overflow-hidden">
+                              <div className="aspect-square">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name} 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="p-3">
+                                <h4 className="font-medium">{item.name}</h4>
+                                {item.brand && (
+                                  <p className="text-xs text-gray-500 mt-1">{item.brand}</p>
+                                )}
+                                {item.price && (
+                                  <p className="text-sm font-medium mt-1">{item.price}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </TabsContent>
+                    )}
+                    
+                    {currentOutfit.styleElements.eyewear && (
+                      <TabsContent value="eyewear" className="mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="aspect-square rounded-lg overflow-hidden">
+                            <img 
+                              src={currentOutfit.styleElements.eyewear.image} 
+                              alt={currentOutfit.styleElements.eyewear.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <h4 className="font-medium text-lg">{currentOutfit.styleElements.eyewear.name}</h4>
+                            <p className="text-sm text-gray-600 mt-2">
+                              These frames add a touch of personality while complementing the overall aesthetic of your look.
+                            </p>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    )}
+                    
+                    {currentOutfit.styleElements.nails && (
+                      <TabsContent value="nails" className="mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="aspect-square rounded-lg overflow-hidden">
+                            <img 
+                              src={currentOutfit.styleElements.nails.image} 
+                              alt={currentOutfit.styleElements.nails.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <h4 className="font-medium text-lg">{currentOutfit.styleElements.nails.name}</h4>
+                            <p className="text-sm text-gray-600 mt-2">
+                              This nail design adds a refined finishing touch that ties your entire look together.
+                            </p>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    )}
+                  </Tabs>
+                </div>
+              )}
+              
+              {designerMode && currentOutfit.designerNotes && (
+                <div className="bg-neutral-50 p-4 rounded-lg border border-dashed">
+                  <h3 className="font-medium mb-2">Designer Notes</h3>
+                  <p className="text-sm italic">{currentOutfit.designerNotes}</p>
+                  {currentOutfit.celebrityInspiration && (
+                    <div className="mt-2 flex items-center">
+                      <Badge className="bg-closetx-teal/60">
+                        Inspired by {currentOutfit.celebrityInspiration}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <div className="flex justify-center gap-4 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => handleFeedback(true)}
+                >
+                  <ThumbsUp className="mr-2 h-4 w-4" />
+                  Love it
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => handleFeedback(false)}
+                >
+                  <ThumbsDown className="mr-2 h-4 w-4" />
+                  Not for me
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {generatedOutfits.length > 0 && !currentOutfit && (
+            <div className="mt-6 border-t pt-4">
+              <h3 className="font-medium mb-3">Recent Outfits</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {generatedOutfits.map((outfit) => (
+                  <div 
+                    key={outfit.id} 
+                    className="border rounded-md overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setCurrentOutfit(outfit)}
+                  >
+                    <div className="aspect-[4/3] relative">
+                      <img 
+                        src={outfit.thumbnail} 
+                        alt={outfit.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                        <div className="p-2 text-white">
+                          <p className="font-medium text-sm">{outfit.title}</p>
+                          <p className="text-xs opacity-90">{outfit.items.length} items</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {savedOutfits.length > 0 && (
+            <div className="mt-6 border-t pt-4">
+              <h3 className="font-medium mb-3">Saved Outfits</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {savedOutfits.map((outfit) => (
+                  <div 
+                    key={outfit.id} 
+                    className="border rounded-md overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setCurrentOutfit(outfit)}
+                  >
+                    <div className="aspect-[4/3] relative">
+                      <img 
+                        src={outfit.thumbnail} 
+                        alt={outfit.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                        <div className="p-2 text-white">
+                          <p className="font-medium text-sm">{outfit.title}</p>
+                          <p className="text-xs opacity-90">{outfit.occasion}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default OutfitGenerator;
