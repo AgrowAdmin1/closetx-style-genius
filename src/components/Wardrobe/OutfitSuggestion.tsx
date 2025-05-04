@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ClothingItemType } from './ClothingItem';
 import { Badge } from '@/components/ui/badge';
-import { Shirt, Eyewear, Ring, Lipstick, Shoe, Brush, Necklace, Watch } from 'lucide-react';
+import { Shirt, Eye, Ring, Watch, Brush } from 'lucide-react';
 
 export type StyleItemType = {
   id: string;
@@ -42,20 +41,19 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) 
   const getCategoryIcon = (category: string) => {
     switch (category.toLowerCase()) {
       case 'eyewear':
-        return <Eyewear className="h-4 w-4 text-gray-500" />;
+        return <Eye className="h-4 w-4 text-gray-500" />;
       case 'jewelry':
       case 'ring':
         return <Ring className="h-4 w-4 text-gray-500" />;
       case 'necklace':
-        return <Necklace className="h-4 w-4 text-gray-500" />;
       case 'watch':
         return <Watch className="h-4 w-4 text-gray-500" />;
       case 'makeup':
       case 'lipstick':
-        return <Lipstick className="h-4 w-4 text-gray-500" />;
+        return <Brush className="h-4 w-4 text-gray-500" />;
       case 'footwear':
       case 'shoe':
-        return <Shoe className="h-4 w-4 text-gray-500" />;
+        return <Shirt className="h-4 w-4 text-gray-500" />;
       case 'hairstyle':
         return <Brush className="h-4 w-4 text-gray-500" />;
       default:
