@@ -7,14 +7,61 @@ import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity } from 
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import { toast } from 'sonner';
 
-// Sample data - in a real app this would come from the user's wardrobe
+// Realistic clothing images by category
+const realClothingImages = {
+  tops: [
+    "https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  bottoms: [
+    "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  footwear: [
+    "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1560343090-f0409e92791a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1595341888016-a392ef81b7de?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  dresses: [
+    "https://images.unsplash.com/photo-1612336307429-8a898d10e223?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1596783074918-c84cb1bd5d44?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  outerwear: [
+    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1548883354-94bcfe321cbb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ]
+};
+
+// Helper function to get a realistic image for a clothing category
+const getRealisticImage = (category: string): string => {
+  const lowerCategory = category.toLowerCase();
+  
+  if (lowerCategory.includes('top')) return realClothingImages.tops[Math.floor(Math.random() * realClothingImages.tops.length)];
+  if (lowerCategory.includes('bottom') || lowerCategory.includes('pant') || lowerCategory.includes('jean')) 
+    return realClothingImages.bottoms[Math.floor(Math.random() * realClothingImages.bottoms.length)];
+  if (lowerCategory.includes('shoe') || lowerCategory.includes('footwear') || lowerCategory.includes('boot')) 
+    return realClothingImages.footwear[Math.floor(Math.random() * realClothingImages.footwear.length)];
+  if (lowerCategory.includes('dress')) 
+    return realClothingImages.dresses[Math.floor(Math.random() * realClothingImages.dresses.length)];
+  if (lowerCategory.includes('coat') || lowerCategory.includes('jacket') || lowerCategory.includes('outerwear')) 
+    return realClothingImages.outerwear[Math.floor(Math.random() * realClothingImages.outerwear.length)];
+  
+  // Fallback to tops if category doesn't match
+  return realClothingImages.tops[Math.floor(Math.random() * realClothingImages.tops.length)];
+};
+
+// Enhanced sample data with realistic images
 const mockWardrobe: ClothingItemType[] = [
   {
     id: '1',
     name: 'White Cotton Shirt',
     category: 'Tops',
     color: 'White',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: getRealisticImage('Tops'),
     season: ['Spring', 'Summer', 'Fall'],
     brand: 'Zara'
   },
@@ -23,7 +70,7 @@ const mockWardrobe: ClothingItemType[] = [
     name: 'Blue Denim Jeans',
     category: 'Bottoms',
     color: 'Blue',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: getRealisticImage('Bottoms'),
     season: ['All Season'],
     brand: 'Levi\'s'
   },
@@ -32,7 +79,7 @@ const mockWardrobe: ClothingItemType[] = [
     name: 'Black Leather Jacket',
     category: 'Outerwear',
     color: 'Black',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: getRealisticImage('Outerwear'),
     season: ['Fall', 'Winter'],
     brand: 'H&M'
   },
@@ -41,7 +88,7 @@ const mockWardrobe: ClothingItemType[] = [
     name: 'White Sneakers',
     category: 'Footwear',
     color: 'White',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: getRealisticImage('Footwear'),
     season: ['All Season'],
     brand: 'Nike'
   },
@@ -50,7 +97,7 @@ const mockWardrobe: ClothingItemType[] = [
     name: 'Red Summer Dress',
     category: 'Dresses',
     color: 'Red',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: getRealisticImage('Dresses'),
     season: ['Summer'],
     brand: 'Mango'
   },
@@ -79,40 +126,158 @@ const OutfitGenerator = () => {
     
     // Simulate AI outfit generation with a delay
     setTimeout(() => {
-      // Simple algorithm - in a real app this would be more sophisticated
+      // Enhanced algorithm to create more realistic outfits
       const tops = mockWardrobe.filter(item => item.category === 'Tops' || item.category === 'Outerwear');
       const bottoms = mockWardrobe.filter(item => item.category === 'Bottoms');
       const footwear = mockWardrobe.filter(item => item.category === 'Footwear');
       const dresses = mockWardrobe.filter(item => item.category === 'Dresses');
+      const outerwear = mockWardrobe.filter(item => item.category === 'Outerwear');
       
       let outfit: ClothingItemType[] = [];
       
       // For occasion-specific logic
       if (occasion === 'formal') {
         // Prefer formal items
-        const formalTop = tops.find(item => item.name.includes('Shirt')) || tops[0];
-        if (formalTop) outfit.push(formalTop);
+        const formalTop = tops.find(item => item.name.includes('Shirt')) || 
+          {
+            id: 'formal-top',
+            name: 'Formal Shirt',
+            category: 'Tops',
+            color: 'White',
+            image: getRealisticImage('Tops'),
+            season: ['All Season'],
+            brand: 'Designer Brand'
+          };
+          
+        const formalBottom = {
+          id: 'formal-bottom',
+          name: 'Formal Slacks',
+          category: 'Bottoms',
+          color: 'Black',
+          image: getRealisticImage('Bottoms'),
+          season: ['All Season'],
+          brand: 'Designer Brand'
+        };
+        
+        const formalShoes = {
+          id: 'formal-shoes',
+          name: 'Leather Oxfords',
+          category: 'Footwear',
+          color: 'Black',
+          image: getRealisticImage('Footwear'),
+          season: ['All Season'],
+          brand: 'Designer Brand'
+        };
+        
+        outfit = [formalTop, formalBottom, formalShoes];
       } else if (occasion === 'workout') {
-        // For workout, we might select athletic wear
+        // For workout, select athletic wear
+        const athleticTop = {
+          id: 'athletic-top',
+          name: 'Performance Tee',
+          category: 'Tops',
+          color: 'Gray',
+          image: getRealisticImage('Tops'),
+          season: ['All Season'],
+          brand: 'Athletic Brand'
+        };
+        
+        const athleticBottom = {
+          id: 'athletic-bottom',
+          name: 'Athletic Shorts',
+          category: 'Bottoms',
+          color: 'Black',
+          image: getRealisticImage('Bottoms'),
+          season: ['All Season'],
+          brand: 'Athletic Brand'
+        };
+        
+        const athleticShoes = {
+          id: 'athletic-shoes',
+          name: 'Running Shoes',
+          category: 'Footwear',
+          color: 'Multi',
+          image: getRealisticImage('Footwear'),
+          season: ['All Season'],
+          brand: 'Athletic Brand'
+        };
+        
+        outfit = [athleticTop, athleticBottom, athleticShoes];
       } else {
-        // Default selection
-        if (Math.random() > 0.3 && dresses.length > 0) {
-          // Sometimes choose a dress
-          const dress = dresses[Math.floor(Math.random() * dresses.length)];
-          outfit.push(dress);
+        // For casual and other occasions
+        if (Math.random() > 0.3 && dresses.length > 0 && ['date', 'party'].includes(occasion)) {
+          // Sometimes choose a dress for date or party
+          const dress = dresses[0] || {
+            id: 'casual-dress',
+            name: 'Casual Dress',
+            category: 'Dresses',
+            color: 'Blue',
+            image: getRealisticImage('Dresses'),
+            season: ['Spring', 'Summer'],
+            brand: 'Fashion Brand'
+          };
+          
+          const shoes = {
+            id: 'casual-shoes',
+            name: 'Casual Shoes',
+            category: 'Footwear',
+            color: 'Brown',
+            image: getRealisticImage('Footwear'),
+            season: ['All Season'],
+            brand: 'Fashion Brand'
+          };
+          
+          outfit = [dress, shoes];
         } else {
           // Otherwise choose top and bottom
-          const top = tops[Math.floor(Math.random() * tops.length)];
-          const bottom = bottoms[Math.floor(Math.random() * bottoms.length)];
-          if (top) outfit.push(top);
-          if (bottom) outfit.push(bottom);
+          const casual = occasion === 'casual';
+          const top = tops[0] || {
+            id: 'top',
+            name: casual ? 'Casual Tee' : 'Stylish Top',
+            category: 'Tops',
+            color: casual ? 'Gray' : 'Blue',
+            image: getRealisticImage('Tops'),
+            season: ['Spring', 'Summer', 'Fall'],
+            brand: casual ? 'Everyday Brand' : 'Fashion Brand'
+          };
+          
+          const bottom = bottoms[0] || {
+            id: 'bottom',
+            name: casual ? 'Jeans' : 'Stylish Pants',
+            category: 'Bottoms',
+            color: casual ? 'Blue' : 'Black',
+            image: getRealisticImage('Bottoms'),
+            season: ['All Season'],
+            brand: casual ? 'Everyday Brand' : 'Fashion Brand'
+          };
+          
+          const shoe = footwear[0] || {
+            id: 'shoe',
+            name: casual ? 'Sneakers' : 'Stylish Shoes',
+            category: 'Footwear',
+            color: casual ? 'White' : 'Brown',
+            image: getRealisticImage('Footwear'),
+            season: ['All Season'],
+            brand: casual ? 'Everyday Brand' : 'Fashion Brand'
+          };
+          
+          outfit = [top, bottom, shoe];
+          
+          // Sometimes add outerwear for certain seasons or occasions
+          if (!casual || Math.random() > 0.7) {
+            const jacket = outerwear[0] || {
+              id: 'jacket',
+              name: casual ? 'Casual Jacket' : 'Stylish Jacket',
+              category: 'Outerwear',
+              color: casual ? 'Blue' : 'Black',
+              image: getRealisticImage('Outerwear'),
+              season: ['Fall', 'Winter'],
+              brand: casual ? 'Everyday Brand' : 'Fashion Brand'
+            };
+            
+            outfit.push(jacket);
+          }
         }
-      }
-      
-      // Add shoes
-      if (footwear.length > 0) {
-        const shoe = footwear[Math.floor(Math.random() * footwear.length)];
-        outfit.push(shoe);
       }
       
       const newOutfit = {
