@@ -3,9 +3,12 @@ import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity, Shirt, Eyewear, Ring, Watch, Lipstick, Brush, Shoe, TShirt } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
+import { OutfitType, StyleItemType } from '@/components/Wardrobe/OutfitSuggestion';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 // Realistic clothing images by category
 const realClothingImages = {
@@ -36,6 +39,35 @@ const realClothingImages = {
   ]
 };
 
+// Realistic styling elements images
+const stylingElements = {
+  hairstyles: [
+    "https://images.unsplash.com/photo-1605497788044-5a32c7078486?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1605497788044-5a32c7078486?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  makeup: [
+    "https://images.unsplash.com/photo-1597225244660-1cd128c64284?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  jewelry: [
+    "https://images.unsplash.com/photo-1599643477877-530eb83a5801?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1576022162028-726d7141a56f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  eyewear: [
+    "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  nails: [
+    "https://images.unsplash.com/photo-1604654894610-df63bc536371?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1632345031435-8727f6897d53?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ]
+};
+
 // Helper function to get a realistic image for a clothing category
 const getRealisticImage = (category: string): string => {
   const lowerCategory = category.toLowerCase();
@@ -52,6 +84,25 @@ const getRealisticImage = (category: string): string => {
   
   // Fallback to tops if category doesn't match
   return realClothingImages.tops[Math.floor(Math.random() * realClothingImages.tops.length)];
+};
+
+// Helper function to get a styling element image
+const getStylingImage = (category: string): string => {
+  const lowerCategory = category.toLowerCase();
+  
+  if (lowerCategory.includes('hair')) 
+    return stylingElements.hairstyles[Math.floor(Math.random() * stylingElements.hairstyles.length)];
+  if (lowerCategory.includes('makeup') || lowerCategory.includes('lipstick')) 
+    return stylingElements.makeup[Math.floor(Math.random() * stylingElements.makeup.length)];
+  if (lowerCategory.includes('jewelry') || lowerCategory.includes('ring') || lowerCategory.includes('necklace')) 
+    return stylingElements.jewelry[Math.floor(Math.random() * stylingElements.jewelry.length)];
+  if (lowerCategory.includes('eyewear') || lowerCategory.includes('glasses')) 
+    return stylingElements.eyewear[Math.floor(Math.random() * stylingElements.eyewear.length)];
+  if (lowerCategory.includes('nail')) 
+    return stylingElements.nails[Math.floor(Math.random() * stylingElements.nails.length)];
+  
+  // Fallback to jewelry if category doesn't match
+  return stylingElements.jewelry[Math.floor(Math.random() * stylingElements.jewelry.length)];
 };
 
 // Enhanced sample data with realistic images
@@ -103,11 +154,48 @@ const mockWardrobe: ClothingItemType[] = [
   },
 ];
 
-type OutfitType = {
-  id: string;
-  name: string;
-  occasion: string;
-  items: ClothingItemType[];
+// Celebrity inspirations for different occasions
+const celebrityInspirations = {
+  casual: ['Jennifer Aniston', 'Zendaya', 'Ryan Reynolds', 'Timothée Chalamet'],
+  formal: ['Blake Lively', 'Cate Blanchett', 'Michael B. Jordan', 'Tom Ford'],
+  work: ['Amal Clooney', 'Victoria Beckham', 'David Beckham', 'Ryan Gosling'],
+  date: ['Emily Ratajkowski', 'Margot Robbie', 'Harry Styles', 'Chris Hemsworth'],
+  party: ['Rihanna', 'Dua Lipa', 'A$AP Rocky', 'Bad Bunny'],
+  workout: ['Dua Lipa', 'Kendall Jenner', 'Chris Hemsworth', 'The Rock']
+};
+
+// Designer notes for different occasions
+const designerNotes = {
+  casual: [
+    'Effortless comfort meets style with this laid-back yet put-together look.',
+    'A versatile ensemble that transitions seamlessly from day to evening.',
+    'Clean lines and relaxed silhouettes create an approachable yet polished appearance.'
+  ],
+  formal: [
+    'Sophisticated elegance with attention to tailoring and luxurious fabrics.',
+    'This refined look combines classic elements with modern details for a timeless appeal.',
+    'Bold structure with subtle accents creates a commanding yet graceful presence.'
+  ],
+  work: [
+    'Professional polish with strategic color pops to convey confidence and creativity.',
+    'Structured silhouettes balanced with comfortable fabrics for all-day wear.',
+    'A contemporary take on workwear that maintains professionalism while expressing personal style.'
+  ],
+  date: [
+    'Subtle sensuality through thoughtful fabric choices and strategic silhouettes.',
+    'Balance of playful elements with sophisticated pieces creates intrigue.',
+    'This look commands attention while maintaining an air of effortless allure.'
+  ],
+  party: [
+    'Statement-making elements combined with confidence-boosting silhouettes.',
+    'Strategic shimmer and texture create dimension that captures light beautifully.',
+    'Bold choices that express personality while ensuring comfort for all-night enjoyment.'
+  ],
+  workout: [
+    'Performance-driven pieces with style elements that motivate and inspire.',
+    'Strategic layering for versatility through various workout intensities.',
+    'Technical fabrics in contemporary silhouettes combine function with fashion-forward design.'
+  ]
 };
 
 const OutfitGenerator = () => {
@@ -118,8 +206,21 @@ const OutfitGenerator = () => {
   const [currentOutfit, setCurrentOutfit] = useState<OutfitType | null>(null);
   const [generatedOutfits, setGeneratedOutfits] = useState<OutfitType[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<OutfitType[]>([]);
+  const [designerMode, setDesignerMode] = useState(false);
+  const [currentTab, setCurrentTab] = useState('clothing');
+  const [celebrityInspiration, setCelebrityInspiration] = useState<string | null>(null);
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
+  
+  // Styling categories for the designer mode
+  const stylingCategories = [
+    { id: 'clothing', name: 'Clothing', icon: <TShirt className="h-4 w-4" /> },
+    { id: 'hair', name: 'Hairstyle', icon: <Brush className="h-4 w-4" /> },
+    { id: 'makeup', name: 'Makeup', icon: <Lipstick className="h-4 w-4" /> },
+    { id: 'jewelry', name: 'Jewelry', icon: <Ring className="h-4 w-4" /> },
+    { id: 'eyewear', name: 'Eyewear', icon: <Eyewear className="h-4 w-4" /> },
+    { id: 'footwear', name: 'Footwear', icon: <Shoe className="h-4 w-4" /> }
+  ];
 
   const generateOutfit = () => {
     setIsGenerating(true);
@@ -279,16 +380,113 @@ const OutfitGenerator = () => {
           }
         }
       }
+
+      // Generate additional styling elements if designer mode is enabled
+      let styleElements = undefined;
+      let selectedCelebrity = null;
+      let designerNote = null;
+
+      if (designerMode) {
+        // Generate a hairstyle recommendation
+        const hairstyle: StyleItemType = {
+          id: 'hairstyle-' + Date.now(),
+          name: occasion === 'formal' ? 'Elegant Updo' : occasion === 'casual' ? 'Textured Waves' : 'Sleek Blowout',
+          category: 'Hairstyle',
+          image: getStylingImage('hairstyle')
+        };
+
+        // Generate makeup recommendation
+        const makeup: StyleItemType = {
+          id: 'makeup-' + Date.now(),
+          name: occasion === 'formal' ? 'Glam Evening Look' : occasion === 'casual' ? 'Natural No-Makeup Look' : 'Polished Daytime',
+          category: 'Makeup',
+          image: getStylingImage('makeup')
+        };
+
+        // Generate jewelry recommendation
+        const jewelry: StyleItemType[] = [
+          {
+            id: 'jewelry-1-' + Date.now(),
+            name: occasion === 'formal' ? 'Statement Earrings' : 'Delicate Necklace',
+            category: 'Jewelry',
+            image: getStylingImage('jewelry'),
+            brand: occasion === 'formal' ? 'Luxury Brand' : 'Contemporary Brand',
+            price: occasion === 'formal' ? '$250' : '$85'
+          }
+        ];
+
+        // For formal occasions, add more jewelry
+        if (['formal', 'party', 'date'].includes(occasion)) {
+          jewelry.push({
+            id: 'jewelry-2-' + Date.now(),
+            name: 'Bracelet',
+            category: 'Jewelry',
+            image: getStylingImage('jewelry'),
+            brand: 'Designer Brand',
+            price: '$175'
+          });
+        }
+
+        // Generate eyewear if not formal occasion
+        const eyewear = ['formal', 'party'].includes(occasion) ? undefined : {
+          id: 'eyewear-' + Date.now(),
+          name: occasion === 'casual' ? 'Trendy Sunglasses' : 'Classic Frames',
+          category: 'Eyewear',
+          image: getStylingImage('eyewear')
+        };
+
+        // Generate nail art recommendation
+        const nails = {
+          id: 'nails-' + Date.now(),
+          name: occasion === 'formal' ? 'Classic French Manicure' : occasion === 'party' ? 'Statement Nails' : 'Natural Polish',
+          category: 'Nails',
+          image: getStylingImage('nails')
+        };
+
+        // Footwear if not already in outfit
+        const designerFootwear = outfit.some(item => item.category === 'Footwear') ? undefined : {
+          id: 'footwear-' + Date.now(),
+          name: occasion === 'formal' ? 'Designer Heels' : occasion === 'casual' ? 'Leather Boots' : 'Stylish Flats',
+          category: 'Footwear',
+          image: getRealisticImage('Footwear')
+        };
+
+        styleElements = {
+          hairstyle,
+          makeup,
+          jewelry,
+          eyewear,
+          nails,
+          footwear: designerFootwear
+        };
+
+        // Select a random celebrity inspiration based on the occasion
+        const celebs = celebrityInspirations[occasion as keyof typeof celebrityInspirations] || [];
+        if (celebs.length > 0) {
+          selectedCelebrity = celebs[Math.floor(Math.random() * celebs.length)];
+        }
+
+        // Select a random designer note
+        const notes = designerNotes[occasion as keyof typeof designerNotes] || [];
+        if (notes.length > 0) {
+          designerNote = notes[Math.floor(Math.random() * notes.length)];
+        }
+      }
       
-      const newOutfit = {
+      const newOutfit: OutfitType = {
         id: Date.now().toString(),
-        name: `${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`,
+        title: `${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`,
         occasion: occasion,
         items: outfit,
+        thumbnail: outfit[0].image,
+        styleElements: designerMode ? styleElements : undefined,
+        celebrityInspiration: selectedCelebrity,
+        designerNotes: designerNote
       };
       
       setCurrentOutfit(newOutfit);
-      setOutfitName(newOutfit.name);
+      setOutfitName(newOutfit.title);
+      setCelebrityInspiration(selectedCelebrity);
       setGeneratedOutfits([newOutfit, ...generatedOutfits.slice(0, 4)]);
       setIsGenerating(false);
     }, 1500);
@@ -298,7 +496,8 @@ const OutfitGenerator = () => {
     if (currentOutfit) {
       const outfitToSave = {
         ...currentOutfit,
-        name: outfitName || currentOutfit.name,
+        title: outfitName || currentOutfit.title,
+        celebrityInspiration: celebrityInspiration || currentOutfit.celebrityInspiration
       };
       
       setSavedOutfits([outfitToSave, ...savedOutfits]);
@@ -314,14 +513,26 @@ const OutfitGenerator = () => {
     );
   };
 
+  const toggleDesignerMode = () => {
+    setDesignerMode(!designerMode);
+    if (!designerMode) {
+      toast.success('Celebrity Costume Designer Mode activated!');
+    }
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Outfit Generator</h1>
-          <Button variant="ghost" size="sm" className="text-closetx-teal">
-            <Activity size={16} className="mr-1" />
-            AI Style Analysis
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={`text-closetx-teal border-closetx-teal ${designerMode ? 'bg-closetx-teal/10' : ''}`}
+            onClick={toggleDesignerMode}
+          >
+            <Star size={16} className="mr-1" fill={designerMode ? "currentColor" : "none"} />
+            {designerMode ? 'Costume Designer Active' : 'Costume Designer Mode'}
           </Button>
         </div>
         
@@ -341,6 +552,20 @@ const OutfitGenerator = () => {
               ))}
             </div>
           </div>
+          
+          {designerMode && (
+            <div>
+              <label className="text-sm font-medium mb-2 flex items-center">
+                <Star size={16} className="mr-2" />
+                Celebrity Inspiration (Optional)
+              </label>
+              <Input 
+                placeholder="Enter celebrity name"
+                value={celebrityInspiration || ''}
+                onChange={(e) => setCelebrityInspiration(e.target.value)}
+              />
+            </div>
+          )}
           
           <div>
             <label className="text-sm font-medium mb-2 flex items-center">
@@ -362,12 +587,12 @@ const OutfitGenerator = () => {
             {isGenerating ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Creating Your Outfit...
+                {designerMode ? 'Creating Your Celebrity Look...' : 'Creating Your Outfit...'}
               </>
             ) : (
               <>
                 <Star className="mr-2 h-5 w-5" />
-                Generate Perfect Outfit
+                {designerMode ? 'Generate Celebrity-Inspired Look' : 'Generate Perfect Outfit'}
               </>
             )}
           </Button>
@@ -391,23 +616,168 @@ const OutfitGenerator = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              {currentOutfit.items.map(item => (
-                <div key={item.id} className="border rounded-lg overflow-hidden">
-                  <div className="aspect-square">
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover"
-                    />
+            {designerMode && currentOutfit.celebrityInspiration && (
+              <div className="bg-closetx-teal/10 p-2 rounded-md">
+                <p className="text-sm text-center">
+                  <span className="font-medium">Celebrity Inspiration:</span> {currentOutfit.celebrityInspiration}
+                </p>
+              </div>
+            )}
+            
+            {designerMode && (
+              <Tabs defaultValue="clothing" className="w-full" onValueChange={setCurrentTab}>
+                <TabsList className="w-full">
+                  <TabsTrigger value="clothing">Clothing</TabsTrigger>
+                  {currentOutfit.styleElements?.hairstyle && <TabsTrigger value="hair">Hair</TabsTrigger>}
+                  {currentOutfit.styleElements?.makeup && <TabsTrigger value="makeup">Makeup</TabsTrigger>}
+                  {currentOutfit.styleElements?.jewelry && <TabsTrigger value="jewelry">Jewelry</TabsTrigger>}
+                  {currentOutfit.styleElements?.eyewear && <TabsTrigger value="eyewear">Eyewear</TabsTrigger>}
+                  {currentOutfit.styleElements?.footwear && <TabsTrigger value="footwear">Footwear</TabsTrigger>}
+                </TabsList>
+                
+                <TabsContent value="clothing">
+                  <div className="grid grid-cols-2 gap-4">
+                    {currentOutfit.items.map(item => (
+                      <div key={item.id} className="border rounded-lg overflow-hidden">
+                        <div className="aspect-square">
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-2">
+                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-xs text-gray-500">{item.category}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="p-2">
-                    <p className="text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.category}</p>
+                </TabsContent>
+                
+                {currentOutfit.styleElements?.hairstyle && (
+                  <TabsContent value="hair">
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="aspect-square">
+                        <img 
+                          src={currentOutfit.styleElements.hairstyle.image} 
+                          alt={currentOutfit.styleElements.hairstyle.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="font-medium">{currentOutfit.styleElements.hairstyle.name}</p>
+                        <p className="text-sm text-gray-500">Recommended hairstyle for this occasion</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {currentOutfit.styleElements?.makeup && (
+                  <TabsContent value="makeup">
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="aspect-square">
+                        <img 
+                          src={currentOutfit.styleElements.makeup.image} 
+                          alt={currentOutfit.styleElements.makeup.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="font-medium">{currentOutfit.styleElements.makeup.name}</p>
+                        <p className="text-sm text-gray-500">Makeup look that complements this outfit</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {currentOutfit.styleElements?.jewelry && (
+                  <TabsContent value="jewelry">
+                    <div className="grid grid-cols-2 gap-4">
+                      {currentOutfit.styleElements.jewelry.map(jewelry => (
+                        <div key={jewelry.id} className="border rounded-lg overflow-hidden">
+                          <div className="aspect-square">
+                            <img 
+                              src={jewelry.image} 
+                              alt={jewelry.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="p-2">
+                            <p className="text-sm font-medium">{jewelry.name}</p>
+                            {jewelry.brand && <p className="text-xs text-gray-500">{jewelry.brand}</p>}
+                            {jewelry.price && <Badge className="mt-1">{jewelry.price}</Badge>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {currentOutfit.styleElements?.eyewear && (
+                  <TabsContent value="eyewear">
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="aspect-square">
+                        <img 
+                          src={currentOutfit.styleElements.eyewear.image} 
+                          alt={currentOutfit.styleElements.eyewear.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="font-medium">{currentOutfit.styleElements.eyewear.name}</p>
+                        <p className="text-sm text-gray-500">Eyewear that completes the look</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {currentOutfit.styleElements?.footwear && (
+                  <TabsContent value="footwear">
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="aspect-square">
+                        <img 
+                          src={currentOutfit.styleElements.footwear.image} 
+                          alt={currentOutfit.styleElements.footwear.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="font-medium">{currentOutfit.styleElements.footwear.name}</p>
+                        <p className="text-sm text-gray-500">Perfect footwear for this outfit</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+              </Tabs>
+            )}
+            
+            {!designerMode && (
+              <div className="grid grid-cols-2 gap-4">
+                {currentOutfit.items.map(item => (
+                  <div key={item.id} className="border rounded-lg overflow-hidden">
+                    <div className="aspect-square">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-2">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-gray-500">{item.category}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+            
+            {designerMode && currentOutfit.designerNotes && (
+              <div className="bg-gray-50 p-3 rounded-md italic text-sm">
+                <p className="font-medium mb-1">Designer Notes:</p>
+                <p>{currentOutfit.designerNotes}</p>
+              </div>
+            )}
             
             <div className="flex gap-3">
               <Button
@@ -439,7 +809,7 @@ const OutfitGenerator = () => {
                   className="bg-white rounded-lg p-3 shadow-sm"
                 >
                   <div className="flex justify-between items-center mb-2">
-                    <p className="font-medium">{outfit.name}</p>
+                    <p className="font-medium">{outfit.title}</p>
                     <span className="text-xs bg-closetx-beige px-2 py-1 rounded-full">
                       {outfit.occasion}
                     </span>
@@ -455,6 +825,12 @@ const OutfitGenerator = () => {
                       </div>
                     ))}
                   </div>
+                  
+                  {outfit.celebrityInspiration && (
+                    <p className="text-xs mt-1 text-gray-500">
+                      Inspired by {outfit.celebrityInspiration}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
