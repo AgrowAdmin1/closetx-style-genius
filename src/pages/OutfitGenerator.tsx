@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity, Shirt, Eye, Ring, Watch, Brush } from 'lucide-react';
+import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity, Shirt, Eye, Gem, Watch, Brush } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import { OutfitType, StyleItemType } from '@/components/Wardrobe/OutfitSuggestion';
 import { toast } from 'sonner';
@@ -218,7 +218,7 @@ const OutfitGenerator = () => {
     { id: 'clothing', name: 'Clothing', icon: <Shirt className="h-4 w-4" /> },
     { id: 'hair', name: 'Hairstyle', icon: <Brush className="h-4 w-4" /> },
     { id: 'makeup', name: 'Makeup', icon: <Brush className="h-4 w-4" /> },
-    { id: 'jewelry', name: 'Jewelry', icon: <Ring className="h-4 w-4" /> },
+    { id: 'jewelry', name: 'Jewelry', icon: <Gem className="h-4 w-4" /> },
     { id: 'eyewear', name: 'Eyewear', icon: <Eye className="h-4 w-4" /> },
     { id: 'footwear', name: 'Footwear', icon: <Shirt className="h-4 w-4" /> }
   ];

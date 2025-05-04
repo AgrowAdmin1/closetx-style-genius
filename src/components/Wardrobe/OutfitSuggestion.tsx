@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ClothingItemType } from './ClothingItem';
 import { Badge } from '@/components/ui/badge';
-import { Shirt, Eye, Ring, Watch, Brush } from 'lucide-react';
+import { Shirt, Eye, Gem, Watch, Brush } from 'lucide-react';
 
 export type StyleItemType = {
   id: string;
@@ -44,7 +45,7 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({ outfit, onClick }) 
         return <Eye className="h-4 w-4 text-gray-500" />;
       case 'jewelry':
       case 'ring':
-        return <Ring className="h-4 w-4 text-gray-500" />;
+        return <Gem className="h-4 w-4 text-gray-500" />;
       case 'necklace':
       case 'watch':
         return <Watch className="h-4 w-4 text-gray-500" />;
