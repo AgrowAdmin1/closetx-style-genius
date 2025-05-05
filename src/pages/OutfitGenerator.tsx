@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -586,4 +587,20 @@ const OutfitGenerator = () => {
           >
             {isGenerating ? (
               <>
-                <RefreshCw className="mr-2 h-4 w-4
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Generating your perfect outfit...
+              </>
+            ) : (
+              <>
+                <Star className="mr-2 h-4 w-4" fill="currentColor" />
+                Generate {designerMode ? "Celebrity-Inspired Look" : "Outfit"}
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default OutfitGenerator;
