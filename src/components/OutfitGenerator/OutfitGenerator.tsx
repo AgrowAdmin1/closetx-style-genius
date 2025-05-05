@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -332,7 +331,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-center gap-2">
               <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
@@ -341,7 +340,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-6 py-4">
+          <div className="space-y-4 py-4">
             {!generatedOutfit ? (
               <>
                 <div className="space-y-4">
@@ -436,7 +435,6 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                 </Button>
               </>
             ) : (
-              // ... keep existing code (outfit display, styling elements, feedback buttons)
               <div>
                 {/* Display celebrity inspiration if available */}
                 {designerMode && celebrityInspiration && (
@@ -448,7 +446,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   </div>
                 )}
                 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mb-3">
                   <p className="font-medium text-closetx-teal">
                     Your perfect outfit for {occasion}!
                   </p>
@@ -458,9 +456,9 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   {generatedOutfit.map(item => (
-                    <div key={item.id} className="border rounded-lg overflow-hidden">
+                    <div key={item.id} className="border rounded-lg overflow-hidden shadow-sm">
                       <div className="aspect-square">
                         <img 
                           src={item.image} 
@@ -470,8 +468,8 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                       </div>
                       <div className="p-2">
                         <p className="text-sm font-medium truncate">{item.name}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs mt-1">
+                        <div className="flex items-center justify-between mt-1">
+                          <Badge variant="outline" className="text-xs">
                             {item.category}
                           </Badge>
                           <p className="text-xs text-gray-500">{item.brand}</p>
@@ -481,7 +479,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   ))}
                 </div>
                 
-                <div className="flex justify-center gap-3 pt-2">
+                <div className="flex justify-center gap-3 my-3">
                   <Button
                     variant="outline"
                     size="sm"
@@ -502,7 +500,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   </Button>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-4">
                   <Button
                     variant="outline"
                     onClick={() => setGeneratedOutfit(null)}
