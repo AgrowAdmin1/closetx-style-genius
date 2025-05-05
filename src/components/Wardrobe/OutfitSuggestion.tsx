@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ClothingItemType } from './ClothingItem';
 import { Badge } from '@/components/ui/badge';
-import { Shirt, Eye, Gem, Watch, Brush, Sunglasses, Palette, Scissors, Nail } from 'lucide-react';
+import { Shirt, Eye, Gem, Watch, Brush, Glasses, Palette, Scissors } from 'lucide-react';
 
 export type StyleItemType = {
   id: string;
@@ -49,7 +48,7 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({
       case 'eyewear':
       case 'glasses':
       case 'sunglasses':
-        return <Sunglasses className="h-4 w-4 text-gray-500" />;
+        return <Glasses className="h-4 w-4 text-gray-500" />;
       case 'jewelry':
       case 'ring':
         return <Gem className="h-4 w-4 text-gray-500" />;
@@ -70,7 +69,7 @@ const OutfitSuggestion: React.FC<OutfitSuggestionProps> = ({
         return <Scissors className="h-4 w-4 text-gray-500" />;
       case 'nails':
       case 'nail polish':
-        return <Nail className="h-4 w-4 text-gray-500" />;
+        return <Palette className="h-4 w-4 text-gray-500" />; // Changed from Nail to Palette as a substitute
       default:
         return <Shirt className="h-4 w-4 text-gray-500" />;
     }
