@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,8 @@ import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import { OutfitType, StyleItemType } from '@/components/Wardrobe/OutfitSuggestion';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import OutfitSuggestion from '@/components/Wardrobe/OutfitSuggestion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Realistic clothing images by category
 const realClothingImages = {
@@ -210,8 +211,13 @@ const OutfitGenerator = () => {
   const [designerMode, setDesignerMode] = useState(true);
   const [currentTab, setCurrentTab] = useState('clothing');
   const [celebrityInspiration, setCelebrityInspiration] = useState<string | null>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [selectedOutfit, setSelectedOutfit] = useState<OutfitType | null>(null);
+  const [personalStyle, setPersonalStyle] = useState('casual chic');
+  const [colorPreference, setColorPreference] = useState('');
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
+  const styleOptions = ['casual chic', 'bohemian', 'minimalist', 'streetwear', 'classic', 'glamorous'];
   
   // Styling categories for the designer mode with proper icons
   const stylingCategories = [
@@ -228,7 +234,7 @@ const OutfitGenerator = () => {
     
     // Simulate AI outfit generation with a delay
     setTimeout(() => {
-      // Enhanced algorithm to create more realistic outfits
+      // Enhanced algorithm to create more personalized outfits based on style preference
       const tops = mockWardrobe.filter(item => item.category === 'Tops' || item.category === 'Outerwear');
       const bottoms = mockWardrobe.filter(item => item.category === 'Bottoms');
       const footwear = mockWardrobe.filter(item => item.category === 'Footwear');
@@ -237,15 +243,15 @@ const OutfitGenerator = () => {
       
       let outfit: ClothingItemType[] = [];
       
-      // For occasion-specific logic
+      // For occasion-specific logic with personal style influence
       if (occasion === 'formal') {
-        // Prefer formal items
+        // Prefer formal items with style influence
         const formalTop = tops.find(item => item.name.includes('Shirt')) || 
           {
             id: 'formal-top',
-            name: 'Formal Shirt',
+            name: personalStyle === 'glamorous' ? 'Elegant Silk Blouse' : 'Formal Shirt',
             category: 'Tops',
-            color: 'White',
+            color: colorPreference || 'White',
             image: getRealisticImage('Tops'),
             season: ['All Season'],
             brand: 'Designer Brand'
@@ -253,9 +259,9 @@ const OutfitGenerator = () => {
           
         const formalBottom = {
           id: 'formal-bottom',
-          name: 'Formal Slacks',
+          name: personalStyle === 'classic' ? 'Tailored Slacks' : 'Formal Trousers',
           category: 'Bottoms',
-          color: 'Black',
+          color: colorPreference || 'Black',
           image: getRealisticImage('Bottoms'),
           season: ['All Season'],
           brand: 'Designer Brand'
@@ -263,9 +269,9 @@ const OutfitGenerator = () => {
         
         const formalShoes = {
           id: 'formal-shoes',
-          name: 'Leather Oxfords',
+          name: personalStyle === 'glamorous' ? 'Statement Heels' : 'Leather Oxfords',
           category: 'Footwear',
-          color: 'Black',
+          color: colorPreference || 'Black',
           image: getRealisticImage('Footwear'),
           season: ['All Season'],
           brand: 'Designer Brand'
@@ -273,12 +279,12 @@ const OutfitGenerator = () => {
         
         outfit = [formalTop, formalBottom, formalShoes];
       } else if (occasion === 'workout') {
-        // For workout, select athletic wear
+        // For workout, select athletic wear based on style
         const athleticTop = {
           id: 'athletic-top',
-          name: 'Performance Tee',
+          name: personalStyle === 'streetwear' ? 'Graphic Performance Tee' : 'Technical Performance Top',
           category: 'Tops',
-          color: 'Gray',
+          color: colorPreference || 'Gray',
           image: getRealisticImage('Tops'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -286,9 +292,9 @@ const OutfitGenerator = () => {
         
         const athleticBottom = {
           id: 'athletic-bottom',
-          name: 'Athletic Shorts',
+          name: personalStyle === 'minimalist' ? 'Fitted Athletic Shorts' : 'Performance Leggings',
           category: 'Bottoms',
-          color: 'Black',
+          color: colorPreference || 'Black',
           image: getRealisticImage('Bottoms'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -296,9 +302,9 @@ const OutfitGenerator = () => {
         
         const athleticShoes = {
           id: 'athletic-shoes',
-          name: 'Running Shoes',
+          name: personalStyle === 'streetwear' ? 'Statement Sneakers' : 'High Performance Running Shoes',
           category: 'Footwear',
-          color: 'Multi',
+          color: colorPreference || 'Multi',
           image: getRealisticImage('Footwear'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -306,14 +312,15 @@ const OutfitGenerator = () => {
         
         outfit = [athleticTop, athleticBottom, athleticShoes];
       } else {
-        // For casual and other occasions
+        // For casual and other occasions with personal style influence
         if (Math.random() > 0.3 && dresses.length > 0 && ['date', 'party'].includes(occasion)) {
           // Sometimes choose a dress for date or party
           const dress = dresses[0] || {
             id: 'casual-dress',
-            name: 'Casual Dress',
+            name: personalStyle === 'bohemian' ? 'Flowy Patterned Dress' : 
+                  personalStyle === 'glamorous' ? 'Statement Evening Dress' : 'Casual Dress',
             category: 'Dresses',
-            color: 'Blue',
+            color: colorPreference || 'Blue',
             image: getRealisticImage('Dresses'),
             season: ['Spring', 'Summer'],
             brand: 'Fashion Brand'
@@ -321,9 +328,10 @@ const OutfitGenerator = () => {
           
           const shoes = {
             id: 'casual-shoes',
-            name: 'Casual Shoes',
+            name: personalStyle === 'bohemian' ? 'Embellished Sandals' : 
+                 personalStyle === 'minimalist' ? 'Clean-line Flats' : 'Casual Shoes',
             category: 'Footwear',
-            color: 'Brown',
+            color: colorPreference || 'Brown',
             image: getRealisticImage('Footwear'),
             season: ['All Season'],
             brand: 'Fashion Brand'
@@ -331,13 +339,15 @@ const OutfitGenerator = () => {
           
           outfit = [dress, shoes];
         } else {
-          // Otherwise choose top and bottom
+          // Otherwise choose top and bottom based on personal style
           const casual = occasion === 'casual';
           const top = tops[0] || {
             id: 'top',
-            name: casual ? 'Casual Tee' : 'Stylish Top',
+            name: personalStyle === 'streetwear' ? 'Graphic Tee' : 
+                 personalStyle === 'bohemian' ? 'Embroidered Blouse' : 
+                 personalStyle === 'minimalist' ? 'Clean-cut Top' : 'Casual Tee',
             category: 'Tops',
-            color: casual ? 'Gray' : 'Blue',
+            color: colorPreference || (casual ? 'Gray' : 'Blue'),
             image: getRealisticImage('Tops'),
             season: ['Spring', 'Summer', 'Fall'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -345,9 +355,11 @@ const OutfitGenerator = () => {
           
           const bottom = bottoms[0] || {
             id: 'bottom',
-            name: casual ? 'Jeans' : 'Stylish Pants',
+            name: personalStyle === 'streetwear' ? 'Cargo Pants' : 
+                 personalStyle === 'bohemian' ? 'Flowy Skirt' : 
+                 personalStyle === 'minimalist' ? 'Tailored Pants' : 'Jeans',
             category: 'Bottoms',
-            color: casual ? 'Blue' : 'Black',
+            color: colorPreference || (casual ? 'Blue' : 'Black'),
             image: getRealisticImage('Bottoms'),
             season: ['All Season'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -355,9 +367,11 @@ const OutfitGenerator = () => {
           
           const shoe = footwear[0] || {
             id: 'shoe',
-            name: casual ? 'Sneakers' : 'Stylish Shoes',
+            name: personalStyle === 'streetwear' ? 'High-top Sneakers' : 
+                 personalStyle === 'bohemian' ? 'Leather Sandals' : 
+                 personalStyle === 'minimalist' ? 'Simple Loafers' : 'Sneakers',
             category: 'Footwear',
-            color: casual ? 'White' : 'Brown',
+            color: colorPreference || (casual ? 'White' : 'Brown'),
             image: getRealisticImage('Footwear'),
             season: ['All Season'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -369,9 +383,10 @@ const OutfitGenerator = () => {
           if (!casual || Math.random() > 0.7) {
             const jacket = outerwear[0] || {
               id: 'jacket',
-              name: casual ? 'Casual Jacket' : 'Stylish Jacket',
+              name: personalStyle === 'streetwear' ? 'Oversized Jacket' : 
+                   personalStyle === 'classic' ? 'Tailored Blazer' : 'Casual Jacket',
               category: 'Outerwear',
-              color: casual ? 'Blue' : 'Black',
+              color: colorPreference || (casual ? 'Blue' : 'Black'),
               image: getRealisticImage('Outerwear'),
               season: ['Fall', 'Winter'],
               brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -388,18 +403,22 @@ const OutfitGenerator = () => {
       let designerNote = null;
 
       if (designerMode) {
-        // Generate a hairstyle recommendation
+        // Generate a hairstyle recommendation based on personal style
         const hairstyle: StyleItemType = {
           id: 'hairstyle-' + Date.now(),
-          name: occasion === 'formal' ? 'Elegant Updo' : occasion === 'casual' ? 'Textured Waves' : 'Sleek Blowout',
+          name: personalStyle === 'bohemian' ? 'Textured Wavy Hair' : 
+               personalStyle === 'classic' ? 'Sleek Blowout' : 
+               personalStyle === 'glamorous' ? 'Elegant Updo' : 'Casual Waves',
           category: 'Hairstyle',
           image: getStylingImage('hairstyle')
         };
 
-        // Generate makeup recommendation
+        // Generate makeup recommendation based on occasion and style
         const makeup: StyleItemType = {
           id: 'makeup-' + Date.now(),
-          name: occasion === 'formal' ? 'Glam Evening Look' : occasion === 'casual' ? 'Natural No-Makeup Look' : 'Polished Daytime',
+          name: personalStyle === 'glamorous' ? 'Bold Defined Look' : 
+               personalStyle === 'minimalist' ? 'Barely-There Glow' : 
+               occasion === 'formal' ? 'Polished Evening Makeup' : 'Natural Daily Look',
           category: 'Makeup',
           image: getStylingImage('makeup')
         };
@@ -408,7 +427,9 @@ const OutfitGenerator = () => {
         const jewelry: StyleItemType[] = [
           {
             id: 'jewelry-1-' + Date.now(),
-            name: occasion === 'formal' ? 'Statement Earrings' : 'Delicate Necklace',
+            name: personalStyle === 'bohemian' ? 'Layered Necklaces' :
+                 personalStyle === 'minimalist' ? 'Delicate Pendant' :
+                 personalStyle === 'glamorous' ? 'Statement Jewelry' : 'Simple Necklace',
             category: 'Jewelry',
             image: getStylingImage('jewelry'),
             brand: occasion === 'formal' ? 'Luxury Brand' : 'Contemporary Brand',
@@ -420,7 +441,9 @@ const OutfitGenerator = () => {
         if (['formal', 'party', 'date'].includes(occasion)) {
           jewelry.push({
             id: 'jewelry-2-' + Date.now(),
-            name: 'Bracelet',
+            name: personalStyle === 'bohemian' ? 'Stacked Bracelets' :
+                 personalStyle === 'minimalist' ? 'Sleek Watch' :
+                 personalStyle === 'glamorous' ? 'Crystal Earrings' : 'Classic Bracelet',
             category: 'Jewelry',
             image: getStylingImage('jewelry'),
             brand: 'Designer Brand',
@@ -431,7 +454,9 @@ const OutfitGenerator = () => {
         // Generate eyewear if not formal occasion
         const eyewear = ['formal', 'party'].includes(occasion) ? undefined : {
           id: 'eyewear-' + Date.now(),
-          name: occasion === 'casual' ? 'Trendy Sunglasses' : 'Classic Frames',
+          name: personalStyle === 'streetwear' ? 'Bold Frame Glasses' :
+               personalStyle === 'classic' ? 'Timeless Frames' :
+               personalStyle === 'bohemian' ? 'Retro Sunglasses' : 'Trendy Eyewear',
           category: 'Eyewear',
           image: getStylingImage('eyewear')
         };
@@ -439,7 +464,9 @@ const OutfitGenerator = () => {
         // Generate nail art recommendation
         const nails = {
           id: 'nails-' + Date.now(),
-          name: occasion === 'formal' ? 'Classic French Manicure' : occasion === 'party' ? 'Statement Nails' : 'Natural Polish',
+          name: personalStyle === 'bohemian' ? 'Earth-Toned Nail Art' :
+               personalStyle === 'minimalist' ? 'Clean Neutral Polish' :
+               personalStyle === 'glamorous' ? 'Sparkling Nail Design' : 'Simple Manicure',
           category: 'Nails',
           image: getStylingImage('nails')
         };
@@ -447,7 +474,9 @@ const OutfitGenerator = () => {
         // Footwear if not already in outfit
         const designerFootwear = outfit.some(item => item.category === 'Footwear') ? undefined : {
           id: 'footwear-' + Date.now(),
-          name: occasion === 'formal' ? 'Designer Heels' : occasion === 'casual' ? 'Leather Boots' : 'Stylish Flats',
+          name: personalStyle === 'bohemian' ? 'Artisanal Sandals' :
+               personalStyle === 'minimalist' ? 'Essential Flats' :
+               personalStyle === 'glamorous' ? 'Statement Heels' : 'Stylish Shoes',
           category: 'Footwear',
           image: getRealisticImage('Footwear')
         };
@@ -463,20 +492,26 @@ const OutfitGenerator = () => {
 
         // Select a random celebrity inspiration based on the occasion
         const celebs = celebrityInspirations[occasion as keyof typeof celebrityInspirations] || [];
-        if (celebs.length > 0) {
+        if (celebs.length > 0 && !celebrityInspiration) {
           selectedCelebrity = celebs[Math.floor(Math.random() * celebs.length)];
+        } else {
+          selectedCelebrity = celebrityInspiration;
         }
 
-        // Select a random designer note
+        // Select a designer note based on personal style and occasion
         const notes = designerNotes[occasion as keyof typeof designerNotes] || [];
         if (notes.length > 0) {
-          designerNote = notes[Math.floor(Math.random() * notes.length)];
+          const baseNote = notes[Math.floor(Math.random() * notes.length)];
+          designerNote = `For your ${personalStyle} style: ${baseNote}`;
         }
       }
       
+      // Create a title based on style and occasion
+      const outfitTitle = `${personalStyle.charAt(0).toUpperCase() + personalStyle.slice(1)} ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`;
+      
       const newOutfit: OutfitType = {
         id: Date.now().toString(),
-        title: `${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`,
+        title: outfitTitle,
         occasion: occasion,
         items: outfit,
         thumbnail: outfit[0].image,
@@ -509,23 +544,28 @@ const OutfitGenerator = () => {
   const handleFeedback = (positive: boolean) => {
     toast.success(
       positive 
-        ? 'Thanks! This helps improve your recommendations' 
-        : 'Got it! We\'ll suggest different styles next time'
+        ? 'Thanks! This helps your personal stylist create better recommendations' 
+        : 'Got it! Your stylist will suggest different options next time'
     );
   };
 
   const toggleDesignerMode = () => {
     setDesignerMode(!designerMode);
     if (!designerMode) {
-      toast.success('Celebrity Costume Designer Mode activated!');
+      toast.success('Personal Costume Designer Mode activated!');
     }
+  };
+  
+  const viewOutfitDetails = (outfit: OutfitType) => {
+    setSelectedOutfit(outfit);
+    setShowDetailDialog(true);
   };
 
   return (
     <AppLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Outfit Generator</h1>
+          <h1 className="text-2xl font-bold">Personal Costume Designer</h1>
           <Button 
             variant="outline" 
             size="sm" 
@@ -538,6 +578,22 @@ const OutfitGenerator = () => {
         </div>
         
         <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Your Personal Style</label>
+            <div className="flex flex-wrap gap-2">
+              {styleOptions.map(style => (
+                <Button 
+                  key={style}
+                  variant={personalStyle === style ? "default" : "outline"}
+                  className={`text-xs ${personalStyle === style ? 'bg-closetx-teal' : ''}`}
+                  onClick={() => setPersonalStyle(style)}
+                >
+                  {style.charAt(0).toUpperCase() + style.slice(1)}
+                </Button>
+              ))}
+            </div>
+          </div>
+          
           <div>
             <label className="text-sm font-medium mb-2 block">What's the occasion?</label>
             <div className="flex flex-wrap gap-2">
@@ -552,6 +608,15 @@ const OutfitGenerator = () => {
                 </Button>
               ))}
             </div>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium mb-2 block">Color Preference (Optional)</label>
+            <Input 
+              placeholder="Enter preferred color"
+              value={colorPreference}
+              onChange={(e) => setColorPreference(e.target.value)}
+            />
           </div>
           
           {designerMode && (
@@ -588,17 +653,135 @@ const OutfitGenerator = () => {
             {isGenerating ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Generating your perfect outfit...
+                Creating your perfect costume...
               </>
             ) : (
               <>
                 <Star className="mr-2 h-4 w-4" fill="currentColor" />
-                Generate {designerMode ? "Celebrity-Inspired Look" : "Outfit"}
+                Create Your Personalized Look
               </>
             )}
           </Button>
         </div>
+        
+        {currentOutfit && (
+          <div className="bg-white rounded-xl p-4 shadow-sm space-y-4 mt-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Your Personalized Look</h2>
+              
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleFeedback(true)}
+                >
+                  <ThumbsUp size={16} className="mr-1" />
+                  Love it
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleFeedback(false)}
+                >
+                  <ThumbsDown size={16} className="mr-1" />
+                  Refine it
+                </Button>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <OutfitSuggestion 
+                outfit={currentOutfit} 
+                onClick={() => viewOutfitDetails(currentOutfit)}
+              />
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Name this look:</label>
+                  <Input 
+                    value={outfitName}
+                    onChange={(e) => setOutfitName(e.target.value)}
+                    placeholder="Enter a name for this outfit"
+                  />
+                </div>
+                
+                {currentOutfit.designerNotes && (
+                  <div className="bg-closetx-teal/10 p-3 rounded-md">
+                    <p className="text-sm font-medium flex items-center mb-1">
+                      <Star size={16} className="mr-2 text-closetx-teal" />
+                      Designer Notes:
+                    </p>
+                    <p className="text-sm italic">{currentOutfit.designerNotes}</p>
+                  </div>
+                )}
+                
+                <Button
+                  onClick={saveOutfit}
+                  className="w-full bg-closetx-teal mt-4"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Save This Look
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={generateOutfit}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Generate Another Look
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {generatedOutfits.length > 0 && (
+          <div className="bg-white rounded-xl p-4 shadow-sm space-y-4 mt-6">
+            <h2 className="text-lg font-semibold">Recently Created Looks</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {generatedOutfits.map(outfit => (
+                <OutfitSuggestion 
+                  key={outfit.id} 
+                  outfit={outfit} 
+                  onClick={() => viewOutfitDetails(outfit)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {savedOutfits.length > 0 && (
+          <div className="bg-white rounded-xl p-4 shadow-sm space-y-4 mt-6">
+            <h2 className="text-lg font-semibold">Your Saved Looks</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {savedOutfits.map(outfit => (
+                <OutfitSuggestion 
+                  key={outfit.id} 
+                  outfit={outfit} 
+                  onClick={() => viewOutfitDetails(outfit)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+      
+      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl">{selectedOutfit?.title}</DialogTitle>
+          </DialogHeader>
+          
+          {selectedOutfit && (
+            <div className="pt-4">
+              <OutfitSuggestion outfit={selectedOutfit} showFullDetails={true} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 };
