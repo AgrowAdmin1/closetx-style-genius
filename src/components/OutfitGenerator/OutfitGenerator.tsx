@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown, Gem } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Badge } from '@/components/ui/badge';

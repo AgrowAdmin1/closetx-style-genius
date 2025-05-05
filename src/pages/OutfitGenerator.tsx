@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -206,7 +207,7 @@ const OutfitGenerator = () => {
   const [currentOutfit, setCurrentOutfit] = useState<OutfitType | null>(null);
   const [generatedOutfits, setGeneratedOutfits] = useState<OutfitType[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<OutfitType[]>([]);
-  const [designerMode, setDesignerMode] = useState(true); // Default to true to showcase the feature
+  const [designerMode, setDesignerMode] = useState(true);
   const [currentTab, setCurrentTab] = useState('clothing');
   const [celebrityInspiration, setCelebrityInspiration] = useState<string | null>(null);
 
@@ -586,4 +587,213 @@ const OutfitGenerator = () => {
           >
             {isGenerating ? (
               <>
-                <RefreshCw
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Star className="mr-2 h-4 w-4" fill="currentColor" />
+                Generate {designerMode ? "Celebrity-Inspired Look" : "Outfit"}
+              </>
+            )}
+          </Button>
+
+          {currentOutfit && (
+            <div className="mt-6 space-y-4">
+              {designerMode && currentOutfit.celebrityInspiration && (
+                <div className="bg-gradient-to-r from-closetx-teal/20 to-purple-100 p-3 rounded-lg">
+                  <p className="text-sm font-medium flex items-center">
+                    <Star className="h-4 w-4 mr-2 fill-yellow-400" />
+                    Inspired by {currentOutfit.celebrityInspiration}
+                  </p>
+                </div>
+              )}
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Name your outfit</label>
+                <Input
+                  value={outfitName}
+                  onChange={(e) => setOutfitName(e.target.value)}
+                  placeholder="Give your outfit a name"
+                />
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-3">Generated Outfit</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {currentOutfit.items.map(item => (
+                    <div key={item.id} className="border rounded-lg overflow-hidden">
+                      <div className="aspect-square">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="p-2">
+                        <p className="text-sm font-medium">{item.name}</p>
+                        <div className="flex justify-between items-center mt-1">
+                          <Badge variant="outline" className="text-xs">{item.category}</Badge>
+                          <span className="text-xs text-gray-500">{item.brand}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {designerMode && currentOutfit.styleElements && (
+                <div>
+                  <h3 className="font-medium mb-3">Styling Elements</h3>
+                  
+                  <Tabs defaultValue="clothing" value={currentTab} onValueChange={setCurrentTab}>
+                    <TabsList className="mb-4 grid grid-cols-3 sm:grid-cols-6 h-auto">
+                      {stylingCategories.map(cat => (
+                        <TabsTrigger
+                          key={cat.id}
+                          value={cat.id}
+                          className="flex flex-col p-2 h-auto"
+                        >
+                          {cat.icon}
+                          <span className="text-[10px] mt-1">{cat.name}</span>
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    
+                    <TabsContent value="clothing" className="mt-0">
+                      <p className="text-sm text-gray-500 mb-3">Clothing items are shown above</p>
+                    </TabsContent>
+                    
+                    <TabsContent value="hair" className="mt-0">
+                      {currentOutfit.styleElements.hairstyle && (
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="aspect-video">
+                            <img 
+                              src={currentOutfit.styleElements.hairstyle.image} 
+                              alt={currentOutfit.styleElements.hairstyle.name}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <div className="p-3">
+                            <p className="font-medium">{currentOutfit.styleElements.hairstyle.name}</p>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="makeup" className="mt-0">
+                      {currentOutfit.styleElements.makeup && (
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="aspect-video">
+                            <img 
+                              src={currentOutfit.styleElements.makeup.image} 
+                              alt={currentOutfit.styleElements.makeup.name}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <div className="p-3">
+                            <p className="font-medium">{currentOutfit.styleElements.makeup.name}</p>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="jewelry" className="mt-0">
+                      {currentOutfit.styleElements.jewelry && (
+                        <div className="grid grid-cols-2 gap-3">
+                          {currentOutfit.styleElements.jewelry.map(jewelry => (
+                            <div key={jewelry.id} className="border rounded-lg overflow-hidden">
+                              <div className="aspect-square">
+                                <img 
+                                  src={jewelry.image} 
+                                  alt={jewelry.name}
+                                  className="w-full h-full object-cover" 
+                                />
+                              </div>
+                              <div className="p-3">
+                                <p className="font-medium">{jewelry.name}</p>
+                                {jewelry.brand && <p className="text-xs text-gray-500">{jewelry.brand}</p>}
+                                {jewelry.price && <p className="text-sm font-medium mt-1">{jewelry.price}</p>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="eyewear" className="mt-0">
+                      {currentOutfit.styleElements.eyewear ? (
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="aspect-video">
+                            <img 
+                              src={currentOutfit.styleElements.eyewear.image} 
+                              alt={currentOutfit.styleElements.eyewear.name}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <div className="p-3">
+                            <p className="font-medium">{currentOutfit.styleElements.eyewear.name}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">No eyewear recommended for this outfit.</p>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="nails" className="mt-0">
+                      {currentOutfit.styleElements.nails && (
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="aspect-video">
+                            <img 
+                              src={currentOutfit.styleElements.nails.image} 
+                              alt={currentOutfit.styleElements.nails.name}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <div className="p-3">
+                            <p className="font-medium">{currentOutfit.styleElements.nails.name}</p>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              )}
+              
+              {currentOutfit.designerNotes && (
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-2">Designer Notes</h3>
+                  <p className="text-sm text-gray-600 italic">"{currentOutfit.designerNotes}"</p>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-between pt-3">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleFeedback(true)}
+                  >
+                    <ThumbsUp className="h-4 w-4 mr-2" />
+                    Love it
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleFeedback(false)}
+                  >
+                    <ThumbsDown className="h-4 w-4 mr-2" />
+                    Not for me
+                  </Button>
+                </div>
+                
+                <Button onClick={saveOutfit} className="bg-closetx-teal">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Outfit
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default OutfitGenerator;
