@@ -235,7 +235,7 @@ const Stories: React.FC<StoriesProps> = ({ className, onCreateStory }) => {
       {/* Stories Container */}
       <div 
         ref={storyContainerRef} 
-        className="flex space-x-3 overflow-x-auto scrollbar-hide py-2 px-1 -mx-1"
+        className="flex space-x-3 overflow-x-auto scrollbar-hide py-2 px-1 -mx-1 mt-10"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {/* Create Story Button */}
