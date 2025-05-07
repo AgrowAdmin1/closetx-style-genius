@@ -71,11 +71,11 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
   };
 
   return (
-    <Card className={className}>
+    <Card className={`${className} hover:shadow-md transition-all duration-300`}>
       <CardHeader className="p-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9">
+            <Avatar className="h-9 w-9 border border-white/20 shadow-sm">
               <AvatarImage src={post.userAvatar} alt={post.userName} />
               <AvatarFallback>{post.userName.charAt(0)}</AvatarFallback>
             </Avatar>
@@ -100,7 +100,11 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
           src={post.imageUrl} 
           alt={`${post.userName}'s post`} 
           className="w-full h-full object-cover"
+          style={{filter: "none"}} // Remove any artificial filters
         />
+        
+        {/* Subtle overlay to enhance depth perception and focus */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
         
         {post.zone && (
           <Badge className="absolute top-3 right-3 bg-closetx-teal/90">
@@ -128,7 +132,7 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
               }}
             >
               {hoveredItem === item.id && (
-                <div className="absolute -top-16 left-0 bg-white p-2 rounded-md shadow-md z-10 min-w-[150px]">
+                <div className="absolute -top-16 left-0 bg-white/95 p-2 rounded-md shadow-md z-10 min-w-[150px] backdrop-blur-sm">
                   <p className="font-medium text-xs">{item.name}</p>
                   <p className="text-xs text-gray-700">{item.brand}</p>
                   {item.price && <p className="text-xs font-semibold">{item.price}</p>}

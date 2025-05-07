@@ -24,11 +24,11 @@ type ClothingItemProps = {
 const ClothingItem: React.FC<ClothingItemProps> = ({ item, onClick }) => {
   return (
     <Card 
-      className="closetx-card overflow-hidden flex flex-col relative" 
+      className="closetx-card overflow-hidden flex flex-col relative hover:shadow-md transition-all duration-300" 
       onClick={onClick}
     >
       {item.isTrending && (
-        <Badge className="absolute top-2 right-2 bg-closetx-teal z-10">
+        <Badge className="absolute top-2 right-2 bg-closetx-teal/90 z-10">
           Trending
         </Badge>
       )}
@@ -38,8 +38,13 @@ const ClothingItem: React.FC<ClothingItemProps> = ({ item, onClick }) => {
           src={item.image} 
           alt={item.name} 
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+          style={{filter: "none"}} // Ensure no filters are applied that might make images look artificial
         />
+        
+        {/* Subtle overlay to create depth and focus on the item */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
       </div>
+      
       <div className="p-3">
         <h3 className="font-medium text-sm truncate">{item.name}</h3>
         <div className="flex justify-between items-center mt-1">

@@ -86,8 +86,8 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
               <div className="text-center space-y-4">
                 <div className="bg-blue-50 text-blue-800 p-4 rounded-lg">
                   <p className="text-sm">
-                    Take a clear photo of your face in good lighting for best results.
-                    This helps us recommend colors and styles that complement your features.
+                    Take a clear photo of your face in natural lighting for the most accurate results.
+                    This helps us recommend colors and styles that truly enhance your natural features.
                   </p>
                 </div>
                 
@@ -113,7 +113,7 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
                 <div className="border rounded-lg overflow-hidden shadow-md">
                   <img 
                     src={previewImage} 
-                    alt="Preview" 
+                    alt="Your photo" 
                     className="w-full aspect-square object-cover"
                   />
                 </div>
@@ -123,7 +123,7 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
                     <div className="flex flex-col items-center space-y-2">
                       <Loader2 className="h-8 w-8 animate-spin text-closetx-teal" />
                       <p className="text-sm text-center">
-                        Analyzing your features...<br />
+                        Analyzing your natural features...<br />
                         <span className="text-xs text-gray-500">This will just take a moment</span>
                       </p>
                     </div>
@@ -149,7 +149,21 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
                 {analyzingImage && (
                   <div className="mt-4 grid grid-cols-3 gap-2">
                     {['fair', 'light', 'medium', 'olive', 'tan', 'deep'].map((tone) => (
-                      <Badge key={tone} variant="outline" className="justify-center py-1 capitalize">
+                      <Badge 
+                        key={tone} 
+                        variant="outline" 
+                        className="justify-center py-1 capitalize"
+                        style={{ 
+                          backgroundColor: tone === 'fair' ? '#f8d7da' : 
+                                          tone === 'light' ? '#f5e0d2' : 
+                                          tone === 'medium' ? '#e6c9a8' : 
+                                          tone === 'olive' ? '#c9b38c' : 
+                                          tone === 'tan' ? '#b59a7c' : 
+                                          tone === 'deep' ? '#8d5a4a' : 'inherit',
+                          color: ['fair', 'light', 'medium'].includes(tone) ? '#333' : '#fff',
+                          borderColor: 'transparent'
+                        }}
+                      >
                         {tone}
                       </Badge>
                     ))}
