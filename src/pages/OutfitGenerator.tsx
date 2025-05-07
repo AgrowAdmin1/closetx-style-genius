@@ -4,13 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity, Shirt, Eye, Gem, Watch, Brush, Glasses } from 'lucide-react';
+import { Calendar, RefreshCw, Save, Star, ThumbsUp, ThumbsDown, Activity, Shirt, Eye, Gem, Watch, Brush, Camera } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import { OutfitType, StyleItemType } from '@/components/Wardrobe/OutfitSuggestion';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import OutfitSuggestion from '@/components/Wardrobe/OutfitSuggestion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import SkinToneAnalyzer from '@/components/Camera/SkinToneAnalyzer';
+
+type SkinToneType = 'fair' | 'light' | 'medium' | 'olive' | 'tan' | 'deep';
+type FaceShapeType = 'oval' | 'round' | 'square' | 'heart' | 'diamond' | 'rectangle';
 
 // Realistic clothing images by category
 const realClothingImages = {
@@ -215,6 +219,12 @@ const OutfitGenerator = () => {
   const [selectedOutfit, setSelectedOutfit] = useState<OutfitType | null>(null);
   const [personalStyle, setPersonalStyle] = useState('casual chic');
   const [colorPreference, setColorPreference] = useState('');
+  const [skinToneData, setSkinToneData] = useState<{
+    skinTone: SkinToneType;
+    faceShape: FaceShapeType;
+    imageUrl: string;
+  } | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
   const styleOptions = ['casual chic', 'bohemian', 'minimalist', 'streetwear', 'classic', 'glamorous'];
@@ -225,7 +235,7 @@ const OutfitGenerator = () => {
     { id: 'hair', name: 'Hairstyle', icon: <Brush className="h-4 w-4" /> },
     { id: 'makeup', name: 'Makeup', icon: <Brush className="h-4 w-4" /> },
     { id: 'jewelry', name: 'Jewelry', icon: <Gem className="h-4 w-4" /> },
-    { id: 'eyewear', name: 'Eyewear', icon: <Glasses className="h-4 w-4" /> },
+    { id: 'eyewear', name: 'Eyewear', icon: <Eye className="h-4 w-4" /> },
     { id: 'nails', name: 'Nails', icon: <Brush className="h-4 w-4" /> }
   ];
 
@@ -234,7 +244,7 @@ const OutfitGenerator = () => {
     
     // Simulate AI outfit generation with a delay
     setTimeout(() => {
-      // Enhanced algorithm to create more personalized outfits based on style preference
+      // Enhanced algorithm to create more personalized outfits based on style preference and skin tone
       const tops = mockWardrobe.filter(item => item.category === 'Tops' || item.category === 'Outerwear');
       const bottoms = mockWardrobe.filter(item => item.category === 'Bottoms');
       const footwear = mockWardrobe.filter(item => item.category === 'Footwear');
@@ -242,6 +252,10 @@ const OutfitGenerator = () => {
       const outerwear = mockWardrobe.filter(item => item.category === 'Outerwear');
       
       let outfit: ClothingItemType[] = [];
+      
+      // Get color recommendations based on skin tone if available
+      const skinToneColors = skinToneData ? getSkinToneColorRecommendations(skinToneData.skinTone) : null;
+      const colorToUse = colorPreference || (skinToneColors ? getRandomColor(skinToneColors) : null);
       
       // For occasion-specific logic with personal style influence
       if (occasion === 'formal') {
@@ -251,7 +265,7 @@ const OutfitGenerator = () => {
             id: 'formal-top',
             name: personalStyle === 'glamorous' ? 'Elegant Silk Blouse' : 'Formal Shirt',
             category: 'Tops',
-            color: colorPreference || 'White',
+            color: colorToUse || 'White',
             image: getRealisticImage('Tops'),
             season: ['All Season'],
             brand: 'Designer Brand'
@@ -261,7 +275,7 @@ const OutfitGenerator = () => {
           id: 'formal-bottom',
           name: personalStyle === 'classic' ? 'Tailored Slacks' : 'Formal Trousers',
           category: 'Bottoms',
-          color: colorPreference || 'Black',
+          color: colorToUse || 'Black',
           image: getRealisticImage('Bottoms'),
           season: ['All Season'],
           brand: 'Designer Brand'
@@ -271,7 +285,7 @@ const OutfitGenerator = () => {
           id: 'formal-shoes',
           name: personalStyle === 'glamorous' ? 'Statement Heels' : 'Leather Oxfords',
           category: 'Footwear',
-          color: colorPreference || 'Black',
+          color: colorToUse || 'Black',
           image: getRealisticImage('Footwear'),
           season: ['All Season'],
           brand: 'Designer Brand'
@@ -284,7 +298,7 @@ const OutfitGenerator = () => {
           id: 'athletic-top',
           name: personalStyle === 'streetwear' ? 'Graphic Performance Tee' : 'Technical Performance Top',
           category: 'Tops',
-          color: colorPreference || 'Gray',
+          color: colorToUse || 'Gray',
           image: getRealisticImage('Tops'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -294,7 +308,7 @@ const OutfitGenerator = () => {
           id: 'athletic-bottom',
           name: personalStyle === 'minimalist' ? 'Fitted Athletic Shorts' : 'Performance Leggings',
           category: 'Bottoms',
-          color: colorPreference || 'Black',
+          color: colorToUse || 'Black',
           image: getRealisticImage('Bottoms'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -304,7 +318,7 @@ const OutfitGenerator = () => {
           id: 'athletic-shoes',
           name: personalStyle === 'streetwear' ? 'Statement Sneakers' : 'High Performance Running Shoes',
           category: 'Footwear',
-          color: colorPreference || 'Multi',
+          color: colorToUse || 'Multi',
           image: getRealisticImage('Footwear'),
           season: ['All Season'],
           brand: 'Athletic Brand'
@@ -320,7 +334,7 @@ const OutfitGenerator = () => {
             name: personalStyle === 'bohemian' ? 'Flowy Patterned Dress' : 
                   personalStyle === 'glamorous' ? 'Statement Evening Dress' : 'Casual Dress',
             category: 'Dresses',
-            color: colorPreference || 'Blue',
+            color: colorToUse || 'Blue',
             image: getRealisticImage('Dresses'),
             season: ['Spring', 'Summer'],
             brand: 'Fashion Brand'
@@ -331,7 +345,7 @@ const OutfitGenerator = () => {
             name: personalStyle === 'bohemian' ? 'Embellished Sandals' : 
                  personalStyle === 'minimalist' ? 'Clean-line Flats' : 'Casual Shoes',
             category: 'Footwear',
-            color: colorPreference || 'Brown',
+            color: colorToUse || 'Brown',
             image: getRealisticImage('Footwear'),
             season: ['All Season'],
             brand: 'Fashion Brand'
@@ -347,7 +361,7 @@ const OutfitGenerator = () => {
                  personalStyle === 'bohemian' ? 'Embroidered Blouse' : 
                  personalStyle === 'minimalist' ? 'Clean-cut Top' : 'Casual Tee',
             category: 'Tops',
-            color: colorPreference || (casual ? 'Gray' : 'Blue'),
+            color: colorToUse || (casual ? 'Gray' : 'Blue'),
             image: getRealisticImage('Tops'),
             season: ['Spring', 'Summer', 'Fall'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -359,7 +373,7 @@ const OutfitGenerator = () => {
                  personalStyle === 'bohemian' ? 'Flowy Skirt' : 
                  personalStyle === 'minimalist' ? 'Tailored Pants' : 'Jeans',
             category: 'Bottoms',
-            color: colorPreference || (casual ? 'Blue' : 'Black'),
+            color: colorToUse || (casual ? 'Blue' : 'Black'),
             image: getRealisticImage('Bottoms'),
             season: ['All Season'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -371,7 +385,7 @@ const OutfitGenerator = () => {
                  personalStyle === 'bohemian' ? 'Leather Sandals' : 
                  personalStyle === 'minimalist' ? 'Simple Loafers' : 'Sneakers',
             category: 'Footwear',
-            color: colorPreference || (casual ? 'White' : 'Brown'),
+            color: colorToUse || (casual ? 'White' : 'Brown'),
             image: getRealisticImage('Footwear'),
             season: ['All Season'],
             brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -386,7 +400,7 @@ const OutfitGenerator = () => {
               name: personalStyle === 'streetwear' ? 'Oversized Jacket' : 
                    personalStyle === 'classic' ? 'Tailored Blazer' : 'Casual Jacket',
               category: 'Outerwear',
-              color: colorPreference || (casual ? 'Blue' : 'Black'),
+              color: colorToUse || (casual ? 'Blue' : 'Black'),
               image: getRealisticImage('Outerwear'),
               season: ['Fall', 'Winter'],
               brand: casual ? 'Everyday Brand' : 'Fashion Brand'
@@ -504,10 +518,17 @@ const OutfitGenerator = () => {
           const baseNote = notes[Math.floor(Math.random() * notes.length)];
           designerNote = `For your ${personalStyle} style: ${baseNote}`;
         }
+        
+        // Add face shape specific recommendations
+        if (skinToneData) {
+          designerNote = `Based on your ${skinToneData.skinTone} skin tone and ${skinToneData.faceShape} face shape: ${getFaceShapeRecommendation(skinToneData.faceShape)}`;
+        }
       }
       
       // Create a title based on style and occasion
-      const outfitTitle = `${personalStyle.charAt(0).toUpperCase() + personalStyle.slice(1)} ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`;
+      const outfitTitle = skinToneData 
+        ? `Personalized ${personalStyle.charAt(0).toUpperCase() + personalStyle.slice(1)} ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Look`
+        : `${personalStyle.charAt(0).toUpperCase() + personalStyle.slice(1)} ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Outfit`;
       
       const newOutfit: OutfitType = {
         id: Date.now().toString(),
@@ -528,6 +549,41 @@ const OutfitGenerator = () => {
     }, 1500);
   };
 
+  const getSkinToneColorRecommendations = (skinTone: SkinToneType): string[] => {
+    switch(skinTone) {
+      case 'fair': return ['Navy', 'Burgundy', 'Emerald', 'Deep Purple'];
+      case 'light': return ['Teal', 'Soft Pink', 'Lavender', 'Forest Green'];
+      case 'medium': return ['Coral', 'Olive', 'Turquoise', 'Cranberry'];
+      case 'olive': return ['Purple', 'Forest Green', 'Burgundy', 'Mustard'];
+      case 'tan': return ['Cobalt Blue', 'Coral', 'Turquoise', 'Bright Pink'];
+      case 'deep': return ['Bright Yellow', 'Fuchsia', 'Emerald', 'Royal Blue'];
+      default: return ['Blue', 'Green', 'Purple', 'Red'];
+    }
+  };
+  
+  const getRandomColor = (colors: string[]): string => {
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+  
+  const getFaceShapeRecommendation = (faceShape: FaceShapeType): string => {
+    switch(faceShape) {
+      case 'oval': 
+        return 'Your versatile face shape works with most styles. Consider balanced proportions in clothing and accessories.';
+      case 'round': 
+        return 'V-necks and vertical patterns elongate your face. Consider angular accessories and structured pieces.';
+      case 'square': 
+        return 'Softening elements like rounded necklines and fluid fabrics complement your strong jawline.';
+      case 'heart': 
+        return 'Balance your proportions with wider-leg pants or A-line skirts. Boat necks work well for your upper body.';
+      case 'diamond': 
+        return 'Emphasize your cheekbones with off-shoulder or scoop neck tops. Structured jackets highlight your frame.';
+      case 'rectangle': 
+        return 'Create curves with belted pieces and peplum styles. Layering adds dimension to your silhouette.';
+      default:
+        return 'This versatile look complements your features and personal style beautifully.';
+    }
+  };
+
   const saveOutfit = () => {
     if (currentOutfit) {
       const outfitToSave = {
@@ -539,6 +595,15 @@ const OutfitGenerator = () => {
       setSavedOutfits([outfitToSave, ...savedOutfits]);
       toast.success('Outfit saved to your collection!');
     }
+  };
+  
+  const handleSkinToneAnalysis = (data: {
+    skinTone: SkinToneType;
+    faceShape: FaceShapeType;
+    imageUrl: string;
+  }) => {
+    setSkinToneData(data);
+    toast.success(`Analysis complete! We'll customize recommendations for your ${data.skinTone} skin tone and ${data.faceShape} face shape.`);
   };
 
   const handleFeedback = (positive: boolean) => {
@@ -578,6 +643,26 @@ const OutfitGenerator = () => {
         </div>
         
         <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
+          <div className="flex flex-wrap gap-3 mb-3 items-center">
+            <SkinToneAnalyzer onAnalysisComplete={handleSkinToneAnalysis} />
+            {skinToneData && (
+              <div className="p-2 bg-green-50 border border-green-100 rounded-md text-xs text-green-700 flex items-center">
+                <div 
+                  className="w-4 h-4 rounded-full mr-2" 
+                  style={{ 
+                    backgroundColor: skinToneData.skinTone === 'fair' ? '#f8d7da' : 
+                                  skinToneData.skinTone === 'light' ? '#f5e0d2' : 
+                                  skinToneData.skinTone === 'medium' ? '#e6c9a8' : 
+                                  skinToneData.skinTone === 'olive' ? '#c9b38c' : 
+                                  skinToneData.skinTone === 'tan' ? '#b59a7c' : 
+                                  skinToneData.skinTone === 'deep' ? '#8d5a4a' : '#e6c9a8'
+                  }}
+                />
+                Analysis complete
+              </div>
+            )}
+          </div>
+          
           <div>
             <label className="text-sm font-medium mb-2 block">Your Personal Style</label>
             <div className="flex flex-wrap gap-2">
@@ -715,13 +800,24 @@ const OutfitGenerator = () => {
                   </div>
                 )}
                 
-                <Button
-                  onClick={saveOutfit}
-                  className="w-full bg-closetx-teal mt-4"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save This Look
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={saveOutfit}
+                    className="flex-1 bg-closetx-teal"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save This Look
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowPreview(true)}
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Preview
+                  </Button>
+                </div>
                 
                 <Button 
                   variant="outline" 
@@ -782,6 +878,81 @@ const OutfitGenerator = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* 3D Preview dialog for the outfit */}
+      {currentOutfit && (
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="sm:max-w-[800px] h-[80vh] p-0 overflow-hidden">
+            <div className="relative h-full bg-gray-100">
+              {/* Silhouette with outfit overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative h-full">
+                  {/* Base silhouette */}
+                  <div className="h-full flex items-center justify-center">
+                    <div className="bg-gray-300 w-64 h-[70vh] rounded-t-full"></div>
+                  </div>
+                  
+                  {/* Outfit pieces positioned on the silhouette */}
+                  {currentOutfit.items.map((item, index) => {
+                    // Position each item based on its category
+                    let positionClass = "";
+                    if (item.category === "Tops") {
+                      positionClass = "absolute top-[20%] left-1/2 transform -translate-x-1/2 w-56";
+                    } else if (item.category === "Bottoms") {
+                      positionClass = "absolute top-[55%] left-1/2 transform -translate-x-1/2 w-56";
+                    } else if (item.category === "Footwear") {
+                      positionClass = "absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32";
+                    } else if (item.category === "Outerwear") {
+                      positionClass = "absolute top-[15%] left-1/2 transform -translate-x-1/2 w-64";
+                    } else if (item.category === "Dresses") {
+                      positionClass = "absolute top-[25%] left-1/2 transform -translate-x-1/2 w-56";
+                    }
+                    
+                    return (
+                      <div key={item.id} className={positionClass}>
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-full object-contain"
+                        />
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Face image if skin tone analysis was done */}
+                  {skinToneData && (
+                    <div className="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white">
+                      <img 
+                        src={skinToneData.imageUrl} 
+                        alt="Face" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Color palette based on skin tone */}
+              {skinToneData && (
+                <div className="absolute bottom-4 left-4 right-4 bg-white p-3 rounded-lg shadow-lg">
+                  <p className="text-sm font-medium mb-2">Recommended colors for your skin tone:</p>
+                  <div className="flex gap-2 justify-center">
+                    {getSkinToneColorRecommendations(skinToneData.skinTone).map((color, i) => (
+                      <div key={i} className="text-center">
+                        <div 
+                          className="w-8 h-8 rounded-full mx-auto mb-1" 
+                          style={{ backgroundColor: color }}
+                        ></div>
+                        <p className="text-xs">{color}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </AppLayout>
   );
 };

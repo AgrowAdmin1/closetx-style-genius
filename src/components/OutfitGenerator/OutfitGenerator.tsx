@@ -1,17 +1,22 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown, Gem } from 'lucide-react';
+import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown, Gem, Eye } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { OutfitType, StyleItemType } from '../Wardrobe/OutfitSuggestion';
+import SkinToneAnalyzer from '../Camera/SkinToneAnalyzer';
 
 type OutfitGeneratorProps = {
   wardrobe: ClothingItemType[];
 };
+
+type SkinToneType = 'fair' | 'light' | 'medium' | 'olive' | 'tan' | 'deep';
+type FaceShapeType = 'oval' | 'round' | 'square' | 'heart' | 'diamond' | 'rectangle';
 
 // Realistic clothing images
 const realClothingImages = {
@@ -70,6 +75,13 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
   const [designerMode, setDesignerMode] = useState(false);
   const [celebrityInspiration, setCelebrityInspiration] = useState<string | null>(null);
   const [styleElements, setStyleElements] = useState<Record<string, any> | null>(null);
+  const [skinToneData, setSkinToneData] = useState<{
+    skinTone: SkinToneType;
+    faceShape: FaceShapeType;
+    imageUrl: string;
+  } | null>(null);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [previewOutfit, setPreviewOutfit] = useState<ClothingItemType[] | null>(null);
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
 
@@ -98,6 +110,9 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
       // Build a coherent outfit based on occasion
       let outfit: ClothingItemType[] = [];
       
+      // Color recommendations based on skin tone if available
+      const colorRecommendation = skinToneData ? getColorForSkinTone(skinToneData.skinTone) : null;
+      
       if (occasion === 'formal') {
         // For formal occasions, prefer dress shirts, formal pants, etc.
         const formalTop = tops.length > 0 
@@ -106,7 +121,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-top',
               name: 'Formal Shirt',
               category: 'Tops',
-              color: 'White',
+              color: colorRecommendation?.tops || 'White',
               image: getRealisticImage('Tops'),
               season: ['All Season'],
               brand: 'Designer'
@@ -118,7 +133,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-bottom',
               name: 'Formal Pants',
               category: 'Bottoms',
-              color: 'Black',
+              color: colorRecommendation?.bottoms || 'Black',
               image: getRealisticImage('Bottoms'),
               season: ['All Season'],
               brand: 'Designer'
@@ -130,7 +145,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-shoes',
               name: 'Formal Shoes',
               category: 'Footwear',
-              color: 'Black',
+              color: colorRecommendation?.accessories || 'Black',
               image: getRealisticImage('Footwear'),
               season: ['All Season'],
               brand: 'Designer'
@@ -145,7 +160,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-top',
               name: 'Casual T-Shirt',
               category: 'Tops',
-              color: 'Blue',
+              color: colorRecommendation?.tops || 'Blue',
               image: getRealisticImage('Tops'),
               season: ['All Season'],
               brand: 'Casual Brand'
@@ -157,7 +172,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-bottom',
               name: 'Jeans',
               category: 'Bottoms',
-              color: 'Blue',
+              color: colorRecommendation?.bottoms || 'Blue',
               image: getRealisticImage('Bottoms'),
               season: ['All Season'],
               brand: 'Casual Brand'
@@ -169,7 +184,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
               id: 'generated-shoes',
               name: 'Sneakers',
               category: 'Footwear',
-              color: 'White',
+              color: colorRecommendation?.accessories || 'White',
               image: getRealisticImage('Footwear'),
               season: ['All Season'],
               brand: 'Casual Brand'
@@ -274,9 +289,11 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
         }
         
         // Generate styling elements like hairstyle, makeup, etc.
+        const hairstyleRec = skinToneData ? getHairstyleForFaceShape(skinToneData.faceShape) : 'Casual Waves';
+        
         setStyleElements({
           hairstyle: {
-            name: occasion === 'formal' ? 'Elegant Updo' : 'Casual Waves',
+            name: occasion === 'formal' ? 'Elegant Updo' : hairstyleRec,
             image: getRealisticImage('hairstyle')
           },
           makeup: {
@@ -293,10 +310,87 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
       }
       
       setGeneratedOutfit(outfit);
-      setStyleMatchScore(4 + Math.random()); // Random score between 4-5 for better user experience
+      setStyleMatchScore(skinToneData ? 5 : 4 + Math.random()); // Higher score if we have skin tone analysis
       
       setIsGenerating(false);
     }, 1500);
+  };
+
+  const getColorForSkinTone = (skinTone: SkinToneType): {tops: string, bottoms: string, accessories: string} => {
+    // Color recommendations based on skin tone
+    switch(skinTone) {
+      case 'fair':
+        return {
+          tops: ['Navy', 'Burgundy', 'Forest Green'][Math.floor(Math.random() * 3)],
+          bottoms: ['Navy', 'Charcoal', 'Burgundy'][Math.floor(Math.random() * 3)],
+          accessories: ['Silver', 'Blue', 'Purple'][Math.floor(Math.random() * 3)]
+        };
+      case 'light':
+        return {
+          tops: ['Teal', 'Lavender', 'Dusty Pink'][Math.floor(Math.random() * 3)],
+          bottoms: ['Navy', 'Gray', 'Dark Teal'][Math.floor(Math.random() * 3)],
+          accessories: ['Silver', 'Rose Gold', 'Blue'][Math.floor(Math.random() * 3)]
+        };
+      case 'medium':
+        return {
+          tops: ['Olive Green', 'Coral', 'Royal Blue'][Math.floor(Math.random() * 3)],
+          bottoms: ['Dark Brown', 'Navy', 'Olive'][Math.floor(Math.random() * 3)],
+          accessories: ['Gold', 'Bronze', 'Green'][Math.floor(Math.random() * 3)]
+        };
+      case 'olive':
+        return {
+          tops: ['Cream', 'Purple', 'Forest Green'][Math.floor(Math.random() * 3)],
+          bottoms: ['Dark Brown', 'Navy', 'Charcoal'][Math.floor(Math.random() * 3)],
+          accessories: ['Gold', 'Copper', 'Purple'][Math.floor(Math.random() * 3)]
+        };
+      case 'tan':
+        return {
+          tops: ['Turquoise', 'Coral', 'Royal Blue'][Math.floor(Math.random() * 3)],
+          bottoms: ['White', 'Khaki', 'Navy'][Math.floor(Math.random() * 3)],
+          accessories: ['Gold', 'Turquoise', 'Coral'][Math.floor(Math.random() * 3)]
+        };
+      case 'deep':
+        return {
+          tops: ['Bright Yellow', 'Fuchsia', 'Emerald'][Math.floor(Math.random() * 3)],
+          bottoms: ['White', 'Navy', 'Dark Brown'][Math.floor(Math.random() * 3)],
+          accessories: ['Gold', 'Bright Colors', 'Green'][Math.floor(Math.random() * 3)]
+        };
+      default:
+        return {
+          tops: 'White',
+          bottoms: 'Black',
+          accessories: 'Silver'
+        };
+    }
+  };
+  
+  const getHairstyleForFaceShape = (faceShape: FaceShapeType): string => {
+    // Hairstyle recommendations based on face shape
+    switch(faceShape) {
+      case 'oval':
+        return 'Any style works well';
+      case 'round':
+        return 'Layered cuts with height';
+      case 'square':
+        return 'Soft layers around the face';
+      case 'heart':
+        return 'Side-swept bangs';
+      case 'diamond':
+        return 'Textured, mid-length cuts';
+      case 'rectangle':
+        return 'Styles with volume on the sides';
+      default:
+        return 'Casual Waves';
+    }
+  };
+  
+  const handleSkinToneAnalysis = (data: {
+    skinTone: SkinToneType;
+    faceShape: FaceShapeType;
+    imageUrl: string;
+  }) => {
+    setSkinToneData(data);
+    toast.success(`Analysis complete! ${data.skinTone} skin tone and ${data.faceShape} face shape detected.`);
   };
 
   const handleSave = () => {
@@ -318,6 +412,19 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
   const toggleDesignerMode = () => {
     setDesignerMode(!designerMode);
     toast.success(designerMode ? 'Designer mode disabled' : 'Celebrity stylist mode enabled!');
+  };
+
+  const togglePreviewMode = () => {
+    if (!generatedOutfit) {
+      toast.error('Generate an outfit first to preview');
+      return;
+    }
+    
+    setPreviewMode(!previewMode);
+    if (!previewMode) {
+      // When entering preview mode, set the outfit to preview
+      setPreviewOutfit(generatedOutfit);
+    }
   };
 
   return (
@@ -344,6 +451,29 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
             {!generatedOutfit ? (
               <>
                 <div className="space-y-4">
+                  <div className="mb-4">
+                    <SkinToneAnalyzer onAnalysisComplete={handleSkinToneAnalysis} />
+                    {skinToneData && (
+                      <div className="mt-2 p-2 bg-green-50 border border-green-100 rounded-md text-xs text-green-700 flex items-center">
+                        <div 
+                          className="w-4 h-4 rounded-full mr-2" 
+                          style={{ 
+                            backgroundColor: skinToneData.skinTone === 'fair' ? '#f8d7da' : 
+                                          skinToneData.skinTone === 'light' ? '#f5e0d2' : 
+                                          skinToneData.skinTone === 'medium' ? '#e6c9a8' : 
+                                          skinToneData.skinTone === 'olive' ? '#c9b38c' : 
+                                          skinToneData.skinTone === 'tan' ? '#b59a7c' : 
+                                          skinToneData.skinTone === 'deep' ? '#8d5a4a' : '#e6c9a8'
+                          }} 
+                        />
+                        <span>
+                          {skinToneData.skinTone.charAt(0).toUpperCase() + skinToneData.skinTone.slice(1)} skin tone, 
+                          {skinToneData.faceShape.charAt(0).toUpperCase() + skinToneData.faceShape.slice(1)} face shape
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
                   <div>
                     <label className="text-sm font-medium mb-2 block">Occasion</label>
                     <div className="flex flex-wrap gap-2">
@@ -517,11 +647,96 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                     Save Outfit
                   </Button>
                 </div>
+                
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={togglePreviewMode}
+                    className="w-full"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    {previewMode ? "Hide Preview" : "Preview This Look"}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
         </DialogContent>
       </Dialog>
+      
+      {previewMode && previewOutfit && (
+        <Dialog open={previewMode} onOpenChange={setPreviewMode}>
+          <DialogContent className="sm:max-w-[800px] h-[80vh] p-0 overflow-hidden">
+            <div className="relative h-full bg-gray-100">
+              {/* Silhouette with outfit overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative h-full">
+                  {/* Base silhouette */}
+                  <div className="h-full flex items-center justify-center">
+                    <div className="bg-gray-300 w-64 h-[70vh] rounded-t-full"></div>
+                  </div>
+                  
+                  {/* Outfit pieces positioned on the silhouette */}
+                  {previewOutfit.map((item, index) => {
+                    // Position each item based on its category
+                    let positionClass = "";
+                    if (item.category === "Tops") {
+                      positionClass = "absolute top-[20%] left-1/2 transform -translate-x-1/2 w-56";
+                    } else if (item.category === "Bottoms") {
+                      positionClass = "absolute top-[55%] left-1/2 transform -translate-x-1/2 w-56";
+                    } else if (item.category === "Footwear") {
+                      positionClass = "absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32";
+                    } else if (item.category === "Outerwear") {
+                      positionClass = "absolute top-[15%] left-1/2 transform -translate-x-1/2 w-64";
+                    } else if (item.category === "Dresses") {
+                      positionClass = "absolute top-[25%] left-1/2 transform -translate-x-1/2 w-56";
+                    }
+                    
+                    return (
+                      <div key={item.id} className={positionClass}>
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-full object-contain"
+                        />
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Face image if skin tone analysis was done */}
+                  {skinToneData && (
+                    <div className="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white">
+                      <img 
+                        src={skinToneData.imageUrl} 
+                        alt="Face" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Color palette based on skin tone */}
+              {skinToneData && (
+                <div className="absolute bottom-4 left-4 right-4 bg-white p-3 rounded-lg shadow-lg">
+                  <p className="text-sm font-medium mb-2">Recommended colors for your skin tone:</p>
+                  <div className="flex gap-2 justify-center">
+                    {Object.entries(getColorForSkinTone(skinToneData.skinTone)).map(([type, color], i) => (
+                      <div key={i} className="text-center">
+                        <div 
+                          className="w-8 h-8 rounded-full mx-auto mb-1" 
+                          style={{ backgroundColor: typeof color === 'string' ? color : '#ccc' }}
+                        ></div>
+                        <p className="text-xs">{type}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
