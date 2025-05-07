@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown, Gem, Eye } from 'lucide-react';
+import { Calendar, Tag, Star, RefreshCw, ThumbsUp, ThumbsDown, Eye, Zap } from 'lucide-react';
 import { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
 import StarRating from '@/components/UI/StarRating';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,7 @@ type OutfitGeneratorProps = {
 type SkinToneType = 'fair' | 'light' | 'medium' | 'olive' | 'tan' | 'deep';
 type FaceShapeType = 'oval' | 'round' | 'square' | 'heart' | 'diamond' | 'rectangle';
 
-// Realistic clothing images
+// Realistic clothing images - using high-quality real product photography
 const realClothingImages = {
   tops: [
     "https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
@@ -44,6 +44,11 @@ const realClothingImages = {
     "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1548883354-94bcfe321cbb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
+  ],
+  models: [
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop"
   ]
 };
 
@@ -60,6 +65,8 @@ const getRealisticImage = (category: string): string => {
     return realClothingImages.dresses[Math.floor(Math.random() * realClothingImages.dresses.length)];
   if (lowerCategory.includes('coat') || lowerCategory.includes('jacket') || lowerCategory.includes('outerwear')) 
     return realClothingImages.outerwear[Math.floor(Math.random() * realClothingImages.outerwear.length)];
+  if (lowerCategory === 'model' || lowerCategory === 'person')
+    return realClothingImages.models[Math.floor(Math.random() * realClothingImages.models.length)];
   
   // Fallback to tops if category doesn't match
   return realClothingImages.tops[Math.floor(Math.random() * realClothingImages.tops.length)];
@@ -82,6 +89,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
   } | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
   const [previewOutfit, setPreviewOutfit] = useState<ClothingItemType[] | null>(null);
+  const [previewType, setPreviewType] = useState<'silhouette' | 'model'>('silhouette');
 
   const occasions = ['casual', 'formal', 'work', 'date', 'party', 'workout'];
 
@@ -93,6 +101,12 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
     date: ['Emily Ratajkowski', 'Margot Robbie', 'Harry Styles', 'Chris Hemsworth'],
     party: ['Rihanna', 'Dua Lipa', 'A$AP Rocky', 'Bad Bunny'],
     workout: ['Dua Lipa', 'Kendall Jenner', 'Chris Hemsworth', 'The Rock']
+  };
+
+  // Helper function to get a model image
+  const getModelImage = () => {
+    const index = Math.floor(Math.random() * realClothingImages.models.length);
+    return realClothingImages.models[index];
   };
 
   const generateOutfit = () => {
@@ -193,7 +207,6 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
         outfit = [casualTop, casualBottom, casualShoes];
       } else {
         // For other occasions, create appropriate outfits
-        // For simplicity, using a random approach
         if (Math.random() > 0.6 && dresses.length > 0) {
           // Sometimes choose a dress for certain occasions
           const dress = dresses.length > 0 
@@ -427,6 +440,10 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
     }
   };
 
+  const switchPreviewType = () => {
+    setPreviewType(previewType === 'silhouette' ? 'model' : 'silhouette');
+  };
+
   return (
     <>
       <Button 
@@ -588,12 +605,13 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                 
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {generatedOutfit.map(item => (
-                    <div key={item.id} className="border rounded-lg overflow-hidden shadow-sm">
+                    <div key={item.id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                       <div className="aspect-square">
                         <img 
                           src={item.image} 
                           alt={item.name} 
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
                       <div className="p-2">
@@ -602,7 +620,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                           <Badge variant="outline" className="text-xs">
                             {item.category}
                           </Badge>
-                          <p className="text-xs text-gray-500">{item.brand}</p>
+                          <p className="text-xs text-gray-600">{item.brand}</p>
                         </div>
                       </div>
                     </div>
@@ -652,7 +670,7 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
                   <Button
                     variant="outline"
                     onClick={togglePreviewMode}
-                    className="w-full"
+                    className="w-full bg-closetx-teal/10 hover:bg-closetx-teal/20 text-closetx-teal border-closetx-teal/30"
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     {previewMode ? "Hide Preview" : "Preview This Look"}
@@ -667,54 +685,103 @@ const OutfitGenerator: React.FC<OutfitGeneratorProps> = ({ wardrobe }) => {
       {previewMode && previewOutfit && (
         <Dialog open={previewMode} onOpenChange={setPreviewMode}>
           <DialogContent className="sm:max-w-[800px] h-[80vh] p-0 overflow-hidden">
-            <div className="relative h-full bg-gray-100">
-              {/* Silhouette with outfit overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative h-full">
-                  {/* Base silhouette */}
-                  <div className="h-full flex items-center justify-center">
-                    <div className="bg-gray-300 w-64 h-[70vh] rounded-t-full"></div>
-                  </div>
-                  
-                  {/* Outfit pieces positioned on the silhouette */}
-                  {previewOutfit.map((item, index) => {
-                    // Position each item based on its category
-                    let positionClass = "";
-                    if (item.category === "Tops") {
-                      positionClass = "absolute top-[20%] left-1/2 transform -translate-x-1/2 w-56";
-                    } else if (item.category === "Bottoms") {
-                      positionClass = "absolute top-[55%] left-1/2 transform -translate-x-1/2 w-56";
-                    } else if (item.category === "Footwear") {
-                      positionClass = "absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32";
-                    } else if (item.category === "Outerwear") {
-                      positionClass = "absolute top-[15%] left-1/2 transform -translate-x-1/2 w-64";
-                    } else if (item.category === "Dresses") {
-                      positionClass = "absolute top-[25%] left-1/2 transform -translate-x-1/2 w-56";
-                    }
+            <div className="relative h-full bg-gradient-to-b from-gray-50 to-gray-100">
+              <div className="absolute top-4 right-4 flex gap-2 z-10">
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={switchPreviewType}
+                  className="bg-white/80 hover:bg-white shadow-sm"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Switch to {previewType === 'silhouette' ? 'Model' : 'Silhouette'} View
+                </Button>
+              </div>
+              
+              {previewType === 'silhouette' ? (
+                /* Silhouette preview */
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative h-full">
+                    {/* Base silhouette */}
+                    <div className="h-full flex items-center justify-center">
+                      <div className="bg-gray-300 w-64 h-[70vh] rounded-t-full"></div>
+                    </div>
                     
-                    return (
-                      <div key={item.id} className={positionClass}>
+                    {/* Outfit pieces positioned on the silhouette */}
+                    {previewOutfit.map((item, index) => {
+                      // Position each item based on its category
+                      let positionClass = "";
+                      if (item.category === "Tops") {
+                        positionClass = "absolute top-[20%] left-1/2 transform -translate-x-1/2 w-56";
+                      } else if (item.category === "Bottoms") {
+                        positionClass = "absolute top-[55%] left-1/2 transform -translate-x-1/2 w-56";
+                      } else if (item.category === "Footwear") {
+                        positionClass = "absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32";
+                      } else if (item.category === "Outerwear") {
+                        positionClass = "absolute top-[15%] left-1/2 transform -translate-x-1/2 w-64";
+                      } else if (item.category === "Dresses") {
+                        positionClass = "absolute top-[25%] left-1/2 transform -translate-x-1/2 w-56";
+                      }
+                      
+                      return (
+                        <div key={item.id} className={positionClass}>
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full object-contain"
+                            loading="lazy"
+                          />
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Face image if skin tone analysis was done */}
+                    {skinToneData && (
+                      <div className="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white">
                         <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full object-contain"
+                          src={skinToneData.imageUrl} 
+                          alt="Face" 
+                          className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
-                    );
-                  })}
-                  
-                  {/* Face image if skin tone analysis was done */}
-                  {skinToneData && (
-                    <div className="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white">
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Model preview */
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative h-full w-full">
+                    {/* Model image */}
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <img 
-                        src={skinToneData.imageUrl} 
-                        alt="Face" 
-                        className="w-full h-full object-cover"
+                        src={getModelImage()} 
+                        alt="Model" 
+                        className="h-[80vh] object-cover"
+                        loading="lazy"
                       />
                     </div>
-                  )}
+                    
+                    {/* Semi-transparent overlay of clothing items */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="relative flex flex-col items-center space-y-4">
+                        {previewOutfit.map((item, index) => (
+                          <div key={item.id} className="text-center">
+                            <img 
+                              src={item.image} 
+                              alt={item.name} 
+                              className="max-w-[200px] max-h-[150px] object-contain rounded shadow-lg"
+                              style={{ opacity: 0.95 }}
+                              loading="lazy"
+                            />
+                            <p className="mt-1 text-sm font-medium bg-white/80 rounded px-2 py-0.5">{item.name}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Color palette based on skin tone */}
               {skinToneData && (

@@ -24,7 +24,7 @@ type ClothingItemProps = {
 const ClothingItem: React.FC<ClothingItemProps> = ({ item, onClick }) => {
   return (
     <Card 
-      className="closetx-card overflow-hidden flex flex-col relative hover:shadow-md transition-all duration-300" 
+      className="closetx-card overflow-hidden flex flex-col relative hover:shadow-md transition-all duration-300 cursor-pointer" 
       onClick={onClick}
     >
       {item.isTrending && (
@@ -38,18 +38,18 @@ const ClothingItem: React.FC<ClothingItemProps> = ({ item, onClick }) => {
           src={item.image} 
           alt={item.name} 
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-          style={{filter: "none"}} // Ensure no filters are applied that might make images look artificial
+          loading="lazy"
         />
         
-        {/* Subtle overlay to create depth and focus on the item */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
+        {/* Natural lighting overlay to enhance image appearance */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
       </div>
       
       <div className="p-3">
         <h3 className="font-medium text-sm truncate">{item.name}</h3>
         <div className="flex justify-between items-center mt-1">
-          <span className="text-xs text-gray-500">{item.category}</span>
-          {item.brand && <span className="text-xs text-gray-500">{item.brand}</span>}
+          <span className="text-xs text-gray-600">{item.category}</span>
+          {item.brand && <span className="text-xs text-gray-600 font-medium">{item.brand}</span>}
         </div>
         
         {item.condition && (
