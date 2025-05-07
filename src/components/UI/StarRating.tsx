@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 type StarRatingProps = {
   rating: number;
@@ -11,6 +12,8 @@ type StarRatingProps = {
   onRatingChange?: (newRating: number) => void;
   readOnly?: boolean;
   animated?: boolean;
+  showCount?: boolean;
+  reviewCount?: number;
 };
 
 const StarRating: React.FC<StarRatingProps> = ({
@@ -20,7 +23,9 @@ const StarRating: React.FC<StarRatingProps> = ({
   className,
   onRatingChange,
   readOnly = true,
-  animated = false
+  animated = false,
+  showCount = false,
+  reviewCount = 0
 }) => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   
@@ -71,6 +76,11 @@ const StarRating: React.FC<StarRatingProps> = ({
         )}>
           {hoverRating || rating}/{maxRating}
         </span>
+      )}
+      {showCount && reviewCount > 0 && (
+        <Badge variant="outline" className="ml-2 text-xs font-normal">
+          {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+        </Badge>
       )}
     </div>
   );
