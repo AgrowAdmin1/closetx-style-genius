@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { Camera } from 'lucide-react';
+import { Camera, Check, Loader2 } from 'lucide-react';
 import CameraCapture from './CameraCapture';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 type SkinToneType = 'fair' | 'light' | 'medium' | 'olive' | 'tan' | 'deep';
 type FaceShapeType = 'oval' | 'round' | 'square' | 'heart' | 'diamond' | 'rectangle';
@@ -36,14 +37,15 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
     // In a real app, this would use a computer vision API or ML model
     setTimeout(() => {
       // Placeholder algorithm - would be replaced with actual ML/AI analysis
-      // Here we're just randomly selecting values for demo purposes
       const skinTones: SkinToneType[] = ['fair', 'light', 'medium', 'olive', 'tan', 'deep'];
       const faceShapes: FaceShapeType[] = ['oval', 'round', 'square', 'heart', 'diamond', 'rectangle'];
       
       const skinTone = skinTones[Math.floor(Math.random() * skinTones.length)];
       const faceShape = faceShapes[Math.floor(Math.random() * faceShapes.length)];
       
-      toast.success('Analysis complete!');
+      toast.success('Analysis complete!', {
+        description: `Your skin tone is ${skinTone} and face shape is ${faceShape}`
+      });
       
       onAnalysisComplete({
         skinTone,
@@ -60,7 +62,7 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
     <>
       <Button 
         variant="outline" 
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-white/90 hover:bg-white shadow-sm"
         onClick={() => setIsOpen(true)}
       >
         <Camera size={16} />
@@ -74,21 +76,23 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
           setShowCamera(false);
         }
       }}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Analyze Your Features</DialogTitle>
+            <DialogTitle className="text-center text-lg font-semibold">Analyze Your Features</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             {!showCamera && !previewImage && (
               <div className="text-center space-y-4">
-                <p className="text-sm text-gray-500">
-                  Take a clear photo of your face in good lighting for best results.
-                  This helps us recommend colors and styles that complement your features.
-                </p>
+                <div className="bg-blue-50 text-blue-800 p-4 rounded-lg">
+                  <p className="text-sm">
+                    Take a clear photo of your face in good lighting for best results.
+                    This helps us recommend colors and styles that complement your features.
+                  </p>
+                </div>
                 
                 <Button 
-                  className="bg-closetx-teal hover:bg-closetx-teal/90 text-white"
+                  className="bg-closetx-teal hover:bg-closetx-teal/90 text-white w-full"
                   onClick={() => setShowCamera(true)}
                 >
                   <Camera className="mr-2 h-5 w-5" />
@@ -106,7 +110,7 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
             
             {previewImage && !showCamera && (
               <div className="space-y-4">
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border rounded-lg overflow-hidden shadow-md">
                   <img 
                     src={previewImage} 
                     alt="Preview" 
@@ -116,30 +120,55 @@ const SkinToneAnalyzer: React.FC<SkinToneAnalysisProps> = ({ onAnalysisComplete 
                 
                 <div className="flex items-center justify-center">
                   {analyzingImage ? (
-                    <p className="text-sm flex items-center">
-                      <span className="animate-spin mr-2">⏳</span>
-                      Analyzing features...
-                    </p>
+                    <div className="flex flex-col items-center space-y-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-closetx-teal" />
+                      <p className="text-sm text-center">
+                        Analyzing your features...<br />
+                        <span className="text-xs text-gray-500">This will just take a moment</span>
+                      </p>
+                    </div>
                   ) : (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full">
                       <Button 
                         variant="outline" 
                         onClick={() => setShowCamera(true)}
+                        className="flex-1"
                       >
                         Retake Photo
                       </Button>
                       <Button
-                        className="bg-closetx-teal hover:bg-closetx-teal/90 text-white"
+                        className="bg-closetx-teal hover:bg-closetx-teal/90 text-white flex-1"
                         onClick={() => analyzeImage(previewImage)}
                       >
-                        Analyze Photo
+                        <Check className="mr-2 h-4 w-4" /> Analyze Photo
                       </Button>
                     </div>
                   )}
                 </div>
+                
+                {analyzingImage && (
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {['fair', 'light', 'medium', 'olive', 'tan', 'deep'].map((tone) => (
+                      <Badge key={tone} variant="outline" className="justify-center py-1 capitalize">
+                        {tone}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
+          
+          <DialogClose asChild>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              className="absolute top-2 right-2 h-8 w-8 p-0 rounded-full"
+            >
+              ✕
+              <span className="sr-only">Close</span>
+            </Button>
+          </DialogClose>
         </DialogContent>
       </Dialog>
     </>
