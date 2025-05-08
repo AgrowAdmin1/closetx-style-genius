@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Search, User, ShoppingBag } from 'lucide-react';
+import { Home, Search, User, ShoppingBag, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Navbar = () => {
@@ -11,6 +11,7 @@ const Navbar = () => {
         <NavItem to="/" icon={<Home size={24} />} label="Home" />
         <NavItem to="/wardrobe" icon={<ShoppingBag size={24} />} label="Wardrobe" />
         <NavItem to="/discover" icon={<Search size={24} />} label="Discover" />
+        <NavItem to="/marketplace" icon={<Star size={24} />} label="Shop" />
         <NavItem to="/profile" icon={<User size={24} />} label="Profile" />
       </div>
     </nav>
@@ -29,7 +30,7 @@ const NavItem = ({ to, icon, label }: NavItemProps) => {
       to={to} 
       className={({ isActive }) => 
         cn(
-          "flex flex-col items-center justify-center w-1/4 transition-colors",
+          "flex flex-col items-center justify-center w-1/5 transition-colors",
           isActive 
             ? "text-closetx-teal" 
             : "text-gray-500 hover:text-closetx-teal"
