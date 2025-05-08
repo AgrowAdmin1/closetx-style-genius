@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -49,9 +48,9 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
   };
   
   return (
-    <div className="fixed top-0 left-0 right-0 z-30 h-16 border-b bg-white flex items-center justify-between px-4 lg:px-6">
+    <div className="fixed top-0 left-0 right-0 z-30 h-16 border-b bg-white shadow-sm flex items-center justify-between px-4 lg:px-6">
       <div className="flex items-center gap-2">
-        <Link to="/">
+        <Link to="/" className="flex items-center">
           <span className="font-bold text-xl text-closetx-teal">ClosetX</span>
         </Link>
         
@@ -63,9 +62,9 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
         )}
       </div>
       
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center gap-3">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
           className="rounded-full"
           onClick={() => navigate('/search')}
@@ -75,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
         </Button>
         
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
           className="rounded-full relative"
           onClick={() => navigate('/chat-overview')}
@@ -88,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
         </Button>
         
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
           className="rounded-full relative"
         >
@@ -103,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
         <Sheet>
           <SheetTrigger asChild>
             <Button 
-              variant="outline" 
+              variant="ghost" 
               size="icon" 
               className="rounded-full relative"
             >
@@ -116,11 +115,11 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
+          <SheetContent className="overflow-y-auto">
+            <SheetHeader className="sticky top-0 bg-white pb-2 z-10">
               <SheetTitle>Shopping Cart</SheetTitle>
             </SheetHeader>
-            <div className="mt-6 space-y-4">
+            <div className="mt-4 space-y-4">
               {cartItems.length > 0 ? (
                 <>
                   {!showOrderProcessing ? (
