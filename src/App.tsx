@@ -18,6 +18,7 @@ import Signup from "./pages/Signup";
 import ItemDetail from "./pages/ItemDetail";
 import Chat from "./pages/Chat";
 import ChatOverview from "./pages/ChatOverview";
+import Entertainment from "./pages/Entertainment";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/add-item" element={<AddItem />} />
           <Route path="/outfit-generator" element={<OutfitGenerator />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/entertainment" element={<Entertainment />} />
           <Route path="/post/:postId" element={<OutfitPost />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
