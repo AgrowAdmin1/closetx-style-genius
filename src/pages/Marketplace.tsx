@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Heart, Search, Filter, Tag, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import OrderProcessing from '@/components/Marketplace/OrderProcessing';
+import { toast } from 'sonner';
 
 type ProductType = {
   id: string;
@@ -97,6 +100,8 @@ const Marketplace = () => {
   const [products, setProducts] = useState(mockProducts);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [cartItems, setCartItems] = useState<Array<{id: string, name: string, price: string, quantity: number, image?: string}>>([]);
+  const [showOrderProcessing, setShowOrderProcessing] = useState(false);
 
   const toggleFavorite = (id: string) => {
     setProducts(products.map(product => 
@@ -104,6 +109,28 @@ const Marketplace = () => {
         ? { ...product, favorited: !product.favorited } 
         : product
     ));
+  };
+
+  const addToCart = (product: ProductType) => {
+    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    
+    if (existingItemIndex >= 0) {
+      // Item already in cart, increase quantity
+      const updatedCartItems = [...cartItems];
+      updatedCartItems[existingItemIndex].quantity += 1;
+      setCartItems(updatedCartItems);
+    } else {
+      // Add new item to cart
+      setCartItems([...cartItems, { 
+        id: product.id, 
+        name: product.name, 
+        price: product.price, 
+        quantity: 1,
+        image: product.image
+      }]);
+    }
+    
+    toast.success(`Added ${product.name} to cart`);
   };
 
   const filteredProducts = products.filter(product => {
@@ -117,10 +144,98 @@ const Marketplace = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const handleOrderComplete = () => {
+    setCartItems([]);
+    setShowOrderProcessing(false);
+    toast.success("Thank you for your purchase!");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Sustainable Marketplace</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Sustainable Marketplace</h1>
+          
+          {cartItems.length > 0 && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center">
+                  <ShoppingBag size={16} className="mr-2" /> 
+                  {cartItems.reduce((total, item) => total + item.quantity, 0)} items
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Your Shopping Cart</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  {!showOrderProcessing ? (
+                    <div className="space-y-4">
+                      {cartItems.map((item, index) => (
+                        <div key={`${item.id}-${index}`} className="flex gap-3">
+                          {item.image && (
+                            <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                              <img 
+                                src={item.image} 
+                                alt={item.name} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <p className="font-medium">{item.name}</p>
+                            <div className="flex justify-between">
+                              <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                              <p className="font-semibold">{item.price}</p>
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => {
+                              setCartItems(cartItems.filter((_, i) => i !== index));
+                              toast.success("Item removed from cart");
+                            }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="border-t pt-4 mt-4">
+                        <div className="flex justify-between mb-2">
+                          <span>Subtotal</span>
+                          <span className="font-semibold">
+                            {cartItems.reduce((total, item) => {
+                              // Extract numeric value from price string
+                              const price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                              return total + (price * item.quantity);
+                            }, 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                          </span>
+                        </div>
+                        <Button 
+                          className="w-full bg-closetx-teal mt-2"
+                          onClick={() => setShowOrderProcessing(true)}
+                        >
+                          Proceed to Checkout
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <OrderProcessing 
+                      cartItems={cartItems}
+                      onClose={() => setShowOrderProcessing(false)}
+                      onOrderComplete={handleOrderComplete}
+                    />
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+        </div>
         
         <div className="flex items-center bg-white rounded-lg p-2 shadow-sm">
           <Search className="text-gray-400 ml-2 mr-1" size={18} />
@@ -193,7 +308,12 @@ const Marketplace = () => {
                 
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-bold text-sm">{product.price}</p>
-                  <Button size="sm" variant="outline" className="h-8 w-8 p-0 border-closetx-teal text-closetx-teal">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-8 w-8 p-0 border-closetx-teal text-closetx-teal"
+                    onClick={() => addToCart(product)}
+                  >
                     <ShoppingBag size={16} />
                   </Button>
                 </div>

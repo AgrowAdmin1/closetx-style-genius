@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { toast } from 'sonner';
+import OrderProcessing from '@/components/Marketplace/OrderProcessing';
 
 interface HeaderProps {
   weather?: {
@@ -18,16 +19,20 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ weather }) => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<{image: string, name: string, price: number}[]>([
+  const [cartItems, setCartItems] = useState<{id: string, image: string, name: string, price: number, quantity: number}[]>([
     {
+      id: '1',
       image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1974&auto=format&fit=crop',
       name: 'Summer Dress',
-      price: 79.99
+      price: 79.99,
+      quantity: 1
     }
   ]);
   
+  const [showOrderProcessing, setShowOrderProcessing] = useState(false);
+  
   const totalItems = cartItems.length;
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
   const removeCartItem = (index: number) => {
     setCartItems(prev => prev.filter((_, i) => i !== index));
@@ -35,8 +40,12 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
   };
   
   const checkout = () => {
-    toast.success("Proceeding to checkout");
-    navigate('/checkout');
+    setShowOrderProcessing(true);
+  };
+
+  const handleOrderComplete = () => {
+    setCartItems([]);
+    toast.success("Order placed successfully! Thank you for shopping with ClosetX.");
   };
   
   return (
@@ -114,42 +123,52 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
             <div className="mt-6 space-y-4">
               {cartItems.length > 0 ? (
                 <>
-                  {cartItems.map((item, index) => (
-                    <div key={index} className="flex gap-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/placeholder.svg';
-                          }}
-                        />
+                  {!showOrderProcessing ? (
+                    <>
+                      {cartItems.map((item, index) => (
+                        <div key={index} className="flex gap-3">
+                          <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                            <img 
+                              src={item.image} 
+                              alt={item.name} 
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = '/placeholder.svg';
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">{item.name}</p>
+                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                            <p className="font-semibold">${item.price.toFixed(2)}</p>
+                          </div>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeCartItem(index)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </Button>
+                        </div>
+                      ))}
+                      <div className="border-t pt-4 mt-4">
+                        <div className="flex justify-between mb-2">
+                          <span>Subtotal</span>
+                          <span className="font-semibold">
+                            ${totalPrice.toFixed(2)}
+                          </span>
+                        </div>
+                        <Button className="w-full bg-closetx-teal" onClick={checkout}>
+                          Proceed to Checkout
+                        </Button>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">Qty: 1</p>
-                        <p className="font-semibold">${item.price.toFixed(2)}</p>
-                      </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeCartItem(index)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </Button>
-                    </div>
-                  ))}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between mb-2">
-                      <span>Subtotal</span>
-                      <span className="font-semibold">
-                        ${totalPrice.toFixed(2)}
-                      </span>
-                    </div>
-                    <Button className="w-full bg-closetx-teal" onClick={checkout}>
-                      Proceed to Checkout
-                    </Button>
-                  </div>
+                    </>
+                  ) : (
+                    <OrderProcessing 
+                      cartItems={cartItems}
+                      onClose={() => setShowOrderProcessing(false)}
+                      onOrderComplete={handleOrderComplete}
+                    />
+                  )}
                 </>
               ) : (
                 <div className="text-center py-8 flex flex-col items-center">
