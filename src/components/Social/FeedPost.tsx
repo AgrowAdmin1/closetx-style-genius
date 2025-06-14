@@ -10,6 +10,7 @@ import { Droplets, Wind } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 import PostAnalysisDialog from "./PostAnalysisDialog";
+import StoryOverlay from "./StoryOverlay";
 
 export type ClothingItemDetail = {
   id: string;
@@ -46,6 +47,13 @@ interface FeedPostProps {
 
 const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  // New: simple state for post index for StoryOverlay navigation
+  const [showStory, setShowStory] = useState(false);
+
+  // Dummy "post list" and index for demonstration (replace this with real feed/context handling for multiple posts)
+  // For now, just this post—StoryOverlay accepts next/prev props for future extensibility
+  const posts = [post];
+  const postIdx = 0;
   
   const formatPostTime = (dateString: string) => {
     const postDate = new Date(dateString);
@@ -73,191 +81,203 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
   const [showAnalysis, setShowAnalysis] = useState(false);
 
   return (
-    <Card className={`${className} hover:shadow-md transition-all duration-300`}>
-      <CardHeader className="p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9 border border-white/20 shadow-sm">
-              <AvatarImage src={post.userAvatar} alt={post.userName} />
-              <AvatarFallback>{post.userName.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium text-sm">{post.userName}</p>
-              {post.location && (
-                <p className="text-xs text-gray-500">{post.location}</p>
-              )}
+    <>
+      <Card className={`${className} hover:shadow-md transition-all duration-300`}>
+        <CardHeader className="p-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-9 w-9 border border-white/20 shadow-sm">
+                <AvatarImage src={post.userAvatar} alt={post.userName} />
+                <AvatarFallback>{post.userName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-sm">{post.userName}</p>
+                {post.location && (
+                  <p className="text-xs text-gray-500">{post.location}</p>
+                )}
+              </div>
             </div>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal className="h-5 w-5" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-5 w-5" />
-          </Button>
-        </div>
-      </CardHeader>
-      
-      <div 
-        className="aspect-square overflow-hidden cursor-pointer relative"
-        onClick={() => setShowAnalysis(true)}
-      >
-        <img 
-          src={post.imageUrl} 
-          alt={`${post.userName}'s post`} 
-          className="w-full h-full object-cover"
-          style={{filter: "none"}}
-        />
+        </CardHeader>
         
-        {/* Subtle overlay to enhance depth perception and focus */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-        
-        {post.zone && (
-          <Badge className="absolute top-3 right-3 bg-closetx-teal/90">
-            {post.zone} Zone
-          </Badge>
-        )}
-        
-        {post.outfitDetails?.map(item => (
-          item.coordinates && (
-            <div 
-              key={item.id}
-              className="absolute border-2 border-closetx-teal/60 cursor-pointer transition-all duration-300 hover:bg-closetx-teal/20"
-              style={{ 
-                top: `${item.coordinates.y1}%`, 
-                left: `${item.coordinates.x1}%`, 
-                width: `${item.coordinates.x2 - item.coordinates.x1}%`, 
-                height: `${item.coordinates.y2 - item.coordinates.y1}%`,
-                opacity: hoveredItem === item.id ? 1 : 0.3,
-              }}
-              onMouseEnter={() => setHoveredItem(item.id)}
-              onMouseLeave={() => setHoveredItem(null)}
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.info(`Viewing ${item.name} details`);
-              }}
-            >
-              {hoveredItem === item.id && (
-                <div className="absolute -top-16 left-0 bg-white/95 p-2 rounded-md shadow-md z-10 min-w-[150px] backdrop-blur-sm">
-                  <p className="font-medium text-xs">{item.name}</p>
-                  <p className="text-xs text-gray-700">{item.brand}</p>
-                  {item.price && <p className="text-xs font-semibold">{item.price}</p>}
-                  {item.rating && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <Star size={12} className="text-amber-500 fill-amber-500" />
-                      <span className="text-xs">{item.rating} ({item.reviewCount || 0})</span>
-                    </div>
-                  )}
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
-                    className="w-full mt-1 h-6 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddToCart(item.id);
-                    }}
-                  >
-                    <ShoppingCart size={10} className="mr-1" /> Add to Cart
-                  </Button>
-                </div>
-              )}
-            </div>
-          )
-        ))}
-      </div>
-
-      <PostAnalysisDialog
-        open={showAnalysis}
-        onOpenChange={setShowAnalysis}
-        imageUrl={post.imageUrl}
-        items={post.outfitDetails ?? []}
-      />
-      
-      <CardContent className="p-4">
-        <SocialActions 
-          postId={post.id}
-          initialLikes={post.likes}
-          initialComments={post.comments}
-          initialSaved={post.saved}
-        />
-        
-        <div className="mt-3">
-          <p className="text-sm">
-            <span className="font-medium">{post.userName}</span>{" "}
-            {post.caption}
-          </p>
+        <div 
+          className="aspect-square overflow-hidden cursor-pointer relative"
+          onClick={() => setShowStory(true)}
+        >
+          <img 
+            src={post.imageUrl} 
+            alt={`${post.userName}'s post`} 
+            className="w-full h-full object-cover"
+            style={{filter: "none"}}
+          />
           
-          <p className="text-xs text-gray-500 mt-1">
-            {formatPostTime(post.timestamp)}
-          </p>
-        </div>
-      </CardContent>
-      
-      {post.outfitDetails && post.outfitDetails.length > 0 && (
-        <CardFooter className="px-4 py-3 border-t text-xs border-gray-100">
-          <div className="w-full">
-            <p className="font-medium text-xs mb-1">Outfit Details</p>
-            <div className="space-y-2">
-              {post.outfitDetails.map(item => (
-                <div key={item.id} className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <p>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
-                    {item.trend && (
-                      <TrendingUp size={12} className={item.trend === 'rising' ? 'text-green-500' : 'text-gray-400'} />
+          {/* Subtle overlay to enhance depth perception and focus */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+          
+          {post.zone && (
+            <Badge className="absolute top-3 right-3 bg-closetx-teal/90">
+              {post.zone} Zone
+            </Badge>
+          )}
+          
+          {post.outfitDetails?.map(item => (
+            item.coordinates && (
+              <div 
+                key={item.id}
+                className="absolute border-2 border-closetx-teal/60 cursor-pointer transition-all duration-300 hover:bg-closetx-teal/20"
+                style={{ 
+                  top: `${item.coordinates.y1}%`, 
+                  left: `${item.coordinates.x1}%`, 
+                  width: `${item.coordinates.x2 - item.coordinates.x1}%`, 
+                  height: `${item.coordinates.y2 - item.coordinates.y1}%`,
+                  opacity: hoveredItem === item.id ? 1 : 0.3,
+                }}
+                onMouseEnter={() => setHoveredItem(item.id)}
+                onMouseLeave={() => setHoveredItem(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toast.info(`Viewing ${item.name} details`);
+                }}
+              >
+                {hoveredItem === item.id && (
+                  <div className="absolute -top-16 left-0 bg-white/95 p-2 rounded-md shadow-md z-10 min-w-[150px] backdrop-blur-sm">
+                    <p className="font-medium text-xs">{item.name}</p>
+                    <p className="text-xs text-gray-700">{item.brand}</p>
+                    {item.price && <p className="text-xs font-semibold">{item.price}</p>}
+                    {item.rating && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star size={12} className="text-amber-500 fill-amber-500" />
+                        <span className="text-xs">{item.rating} ({item.reviewCount || 0})</span>
+                      </div>
                     )}
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    {item.price && (
-                      <Badge variant="outline" className="text-xs font-medium">
-                        {item.price}
-                      </Badge>
-                    )}
-                    
                     <Button 
                       size="sm" 
-                      variant="outline" 
-                      className="h-6 text-xs"
-                      onClick={() => handleAddToCart(item.id)}
+                      variant="secondary" 
+                      className="w-full mt-1 h-6 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(item.id);
+                      }}
                     >
-                      <ShoppingCart size={12} className="mr-1" /> Add
+                      <ShoppingCart size={10} className="mr-1" /> Add to Cart
                     </Button>
                   </div>
-                  
-                  {item.condition && (
-                    <TooltipProvider>
-                      <div className="flex items-center gap-1">
-                        {!item.condition.isClean && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center">
-                                <Droplets size={12} />
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Needs washing</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        
-                        {!item.condition.isIroned && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="secondary" className="h-5 w-5 p-0 flex items-center justify-center">
-                                <Wind size={12} />
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Needs ironing</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </TooltipProvider>
-                  )}
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            )
+          ))}
+        </div>
+
+        <PostAnalysisDialog
+          open={showAnalysis}
+          onOpenChange={setShowAnalysis}
+          imageUrl={post.imageUrl}
+          items={post.outfitDetails ?? []}
+        />
+        
+        <CardContent className="p-4">
+          <SocialActions 
+            postId={post.id}
+            initialLikes={post.likes}
+            initialComments={post.comments}
+            initialSaved={post.saved}
+          />
+          
+          <div className="mt-3">
+            <p className="text-sm">
+              <span className="font-medium">{post.userName}</span>{" "}
+              {post.caption}
+            </p>
+            
+            <p className="text-xs text-gray-500 mt-1">
+              {formatPostTime(post.timestamp)}
+            </p>
           </div>
-        </CardFooter>
-      )}
-    </Card>
+        </CardContent>
+        
+        {post.outfitDetails && post.outfitDetails.length > 0 && (
+          <CardFooter className="px-4 py-3 border-t text-xs border-gray-100">
+            <div className="w-full">
+              <p className="font-medium text-xs mb-1">Outfit Details</p>
+              <div className="space-y-2">
+                {post.outfitDetails.map(item => (
+                  <div key={item.id} className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <p>{item.name} - <span className="text-gray-500">{item.brand}</span></p>
+                      {item.trend && (
+                        <TrendingUp size={12} className={item.trend === 'rising' ? 'text-green-500' : 'text-gray-400'} />
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      {item.price && (
+                        <Badge variant="outline" className="text-xs font-medium">
+                          {item.price}
+                        </Badge>
+                      )}
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-6 text-xs"
+                        onClick={() => handleAddToCart(item.id)}
+                      >
+                        <ShoppingCart size={12} className="mr-1" /> Add
+                      </Button>
+                    </div>
+                    
+                    {item.condition && (
+                      <TooltipProvider>
+                        <div className="flex items-center gap-1">
+                          {!item.condition.isClean && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center">
+                                  <Droplets size={12} />
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Needs washing</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          
+                          {!item.condition.isIroned && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="secondary" className="h-5 w-5 p-0 flex items-center justify-center">
+                                  <Wind size={12} />
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Needs ironing</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TooltipProvider>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardFooter>
+        )}
+      </Card>
+      <StoryOverlay
+        open={showStory}
+        onClose={() => setShowStory(false)}
+        post={post}
+        // These are for future next/prev post nav—currently just one post for demo
+        onPrev={undefined}
+        onNext={undefined}
+        showPrev={false}
+        showNext={false}
+      />
+    </>
   );
 };
 
