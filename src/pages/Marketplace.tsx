@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import OrderProcessing from '@/components/Marketplace/OrderProcessing';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 type ProductType = {
   id: string;
@@ -26,68 +26,68 @@ type ProductType = {
 const mockProducts: ProductType[] = [
   {
     id: '1',
-    name: 'Organic Cotton T-shirt',
-    brand: 'EcoWear',
-    price: '₹899',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    name: 'Classic White Tee',
+    brand: 'Everlane',
+    price: '₹1,999',
+    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 8.5,
     isNew: true,
-    badges: ['Organic', 'Fair Trade'],
+    badges: ['Organic Cotton', 'Ethical Factory'],
     favorited: false,
   },
   {
     id: '2',
-    name: 'Recycled Denim Jeans',
-    brand: 'GreenThread',
-    price: '₹1,499',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    name: 'Vintage Denim Jeans',
+    brand: 'Levi\'s',
+    price: '₹4,499',
+    image: 'https://images.unsplash.com/photo-1602293589930-45a9ec996d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 9.2,
     isNew: false,
-    badges: ['Recycled', 'Water Saving'],
+    badges: ['Recycled', 'Water<Less'],
     favorited: true,
   },
   {
     id: '3',
-    name: 'Hemp Canvas Sneakers',
-    brand: 'Loam',
-    price: '₹2,299',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    name: 'Linen Blend Jumpsuit',
+    brand: 'Reformation',
+    price: '₹7,299',
+    image: 'https://images.unsplash.com/photo-1594618776274-0498b952a8a4?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 7.8,
     isNew: true,
-    badges: ['Vegan', 'Biodegradable'],
+    badges: ['Linen', 'Sustainable'],
     favorited: false,
   },
   {
     id: '4',
-    name: 'Bamboo Fiber Socks',
-    brand: 'EarthSoles',
-    price: '₹399',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    name: 'Cozy Cashmere Sweater',
+    brand: 'Patagonia',
+    price: '₹9,399',
+    image: 'https://images.unsplash.com/photo-1588188267364-9b16503c81d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 8.9,
     isNew: false,
-    badges: ['Antimicrobial', 'Eco-friendly'],
+    badges: ['Recycled Cashmere', 'Fair Trade'],
     favorited: false,
   },
   {
     id: '5',
-    name: 'Tencel Blouse',
-    brand: 'Sage Apparel',
-    price: '₹1,299',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    name: 'Floral Maxi Dress',
+    brand: 'Faithfull the Brand',
+    price: '₹6,299',
+    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 9.5,
     isNew: true,
-    badges: ['Biodegradable', 'Low Impact'],
+    badges: ['Handmade', 'Eco-friendly'],
     favorited: false,
   },
   {
     id: '6',
-    name: 'Recycled Polyester Jacket',
-    brand: 'ReWear',
-    price: '₹2,599',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    name: 'Leather Ankle Boots',
+    brand: 'Dr. Martens',
+    price: '₹12,599',
+    image: 'https://images.unsplash.com/photo-1608256246200-53e635928848?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     sustainabilityScore: 8.2,
     isNew: false,
-    badges: ['Ocean Plastic', 'Water-resistant'],
+    badges: ['Durable', 'Ethically Sourced'],
     favorited: true,
   },
 ];
@@ -97,6 +97,7 @@ const categoryFilters = [
 ];
 
 const Marketplace = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState(mockProducts);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -237,15 +238,17 @@ const Marketplace = () => {
           )}
         </div>
         
-        <div className="flex items-center bg-white rounded-lg p-2 shadow-sm">
-          <Search className="text-gray-400 ml-2 mr-1" size={18} />
-          <Input 
-            className="border-none shadow-none focus-visible:ring-0"
-            placeholder="Search brands, products, or styles" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Button variant="ghost" size="sm">
+        <div className="flex items-center gap-2">
+           <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Input 
+              className="border-gray-300 shadow-sm focus-visible:ring-closetx-teal pl-10"
+              placeholder="Search for clothes, brands and more" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" size="icon" className="flex-shrink-0">
             <Filter size={18} />
           </Button>
         </div>
@@ -263,59 +266,68 @@ const Marketplace = () => {
           ))}
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden">
+            <Card key={product.id} className="overflow-hidden border-none shadow-none bg-transparent group">
               <div className="relative">
-                <div className="aspect-square">
+                <div 
+                  className="aspect-[3/4] overflow-hidden rounded-lg cursor-pointer"
+                  onClick={() => navigate(`/item/${product.id}`)}
+                >
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 {product.isNew && (
-                  <div className="absolute top-2 right-2 bg-closetx-teal text-white text-xs px-2 py-1 rounded-full">
+                  <div className="absolute top-2 left-2 bg-white text-closetx-charcoal text-xs px-2 py-1 rounded-full font-semibold shadow">
                     New
                   </div>
                 )}
                 <button 
-                  className={`absolute top-2 left-2 rounded-full p-1.5 shadow-sm ${product.favorited ? 'bg-closetx-terracotta text-white' : 'bg-white'}`}
-                  onClick={() => toggleFavorite(product.id)}
+                  className={`absolute top-2 right-2 rounded-full p-1.5 shadow-md transition-colors ${product.favorited ? 'bg-closetx-terracotta text-white' : 'bg-white/80 backdrop-blur-sm hover:bg-white'}`}
+                  onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
                 >
-                  <Heart size={16} />
+                  <Heart size={16} fill={product.favorited ? 'currentColor' : 'none'} />
                 </button>
+                <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                   <Button 
+                    size="sm" 
+                    variant="default"
+                    className="w-full bg-black/70 text-white backdrop-blur-sm hover:bg-black"
+                    onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+                  >
+                    <ShoppingBag size={16} className="mr-2"/>
+                    Add to Cart
+                  </Button>
+                </div>
               </div>
               
-              <div className="p-3">
-                <div className="flex items-center">
-                  <div className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-sm flex items-center mr-1">
+              <div 
+                className="p-2 cursor-pointer"
+                onClick={() => navigate(`/item/${product.id}`)}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
+                   <div className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-sm flex items-center mr-1">
                     <Tag size={10} className="mr-0.5" />
                     {product.sustainabilityScore.toFixed(1)}
                   </div>
-                  <p className="text-xs text-gray-500 truncate">{product.brand}</p>
                 </div>
                 
-                <h3 className="font-medium text-sm mt-1 truncate">{product.name}</h3>
+                <p className="text-xs text-gray-500 truncate">{product.brand}</p>
                 
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {product.badges.map((badge, index) => (
-                    <Badge key={index} variant="outline" className="text-xxs py-0 px-1">
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {product.badges.slice(0, 2).map((badge, index) => (
+                    <Badge key={index} variant="secondary" className="text-xxs py-0 px-1.5 font-normal">
                       {badge}
                     </Badge>
                   ))}
                 </div>
                 
                 <div className="flex justify-between items-center mt-2">
-                  <p className="font-bold text-sm">{product.price}</p>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="h-8 w-8 p-0 border-closetx-teal text-closetx-teal"
-                    onClick={() => addToCart(product)}
-                  >
-                    <ShoppingBag size={16} />
-                  </Button>
+                  <p className="font-semibold text-base">{product.price}</p>
                 </div>
               </div>
             </Card>
