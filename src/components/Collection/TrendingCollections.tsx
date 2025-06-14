@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +25,7 @@ const mockTrendingItems: TrendingItem[] = [
   {
     id: 't1',
     name: 'Linen Shirt',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: 'https://images.unsplash.com/photo-1622470953794-3450535db769?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'H&M',
     trend: 95,
     zone: 'Global'
@@ -34,7 +33,7 @@ const mockTrendingItems: TrendingItem[] = [
   {
     id: 't2',
     name: 'Denim Jacket',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: 'https://images.unsplash.com/photo-1543072214-722e1b1b162a?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'Levi\'s',
     trend: 88,
     zone: 'Global'
@@ -42,7 +41,7 @@ const mockTrendingItems: TrendingItem[] = [
   {
     id: 't3',
     name: 'Summer Dress',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'Zara',
     trend: 92,
     zone: 'Local'
@@ -50,7 +49,7 @@ const mockTrendingItems: TrendingItem[] = [
   {
     id: 't4',
     name: 'Silk Scarf',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'Gucci',
     trend: 85,
     zone: 'Local'
@@ -58,26 +57,20 @@ const mockTrendingItems: TrendingItem[] = [
   {
     id: 't5',
     name: 'Leather Boots',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: 'https://images.unsplash.com/photo-1608256246200-53e635928848?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'Dr. Martens',
     trend: 90,
     zone: 'Friends',
-    owner: {
-      name: 'Priya',
-      avatar: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7'
-    }
+    owner: { name: 'Priya', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330' }
   },
   {
     id: 't6',
     name: 'Cotton Tee',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
+    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     brandName: 'Uniqlo',
     trend: 82,
     zone: 'Friends',
-    owner: {
-      name: 'Ananya',
-      avatar: 'https://images.unsplash.com/photo-1596609548086-85bbf8ddb6b9'
-    }
+    owner: { name: 'Ananya', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb' }
   }
 ];
 

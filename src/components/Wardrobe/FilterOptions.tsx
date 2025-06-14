@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
-import { Droplets, Wind, CircleCheck, CircleAlert } from 'lucide-react';
+import { Droplets, Wind, Check } from 'lucide-react';
 
 // Color options with visual representation
 const colorOptions = [
@@ -88,24 +88,30 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
       </TabsContent>
       
       <TabsContent value="colors" className="mt-4">
-        <div className="grid grid-cols-5 gap-3">
-          <Button 
-            variant="outline" 
-            className={activeColor === null ? "border-closetx-teal border-2" : ""}
+        <div className="flex flex-wrap gap-3 items-center">
+          <Button
+            variant={activeColor === null ? 'default' : 'outline'}
+            className={`${activeColor === null ? 'bg-closetx-teal text-white' : ''} rounded-full`}
             onClick={() => setActiveColor(null)}
+            size="sm"
           >
             All
           </Button>
-          {colorOptions.map((color) => (
-            <Button
-              key={color.value}
-              variant="outline"
-              className={`h-10 p-0 ${activeColor === color.value ? "ring-2 ring-closetx-teal" : ""} ${color.border ? "border border-gray-300" : ""}`}
-              style={{ backgroundColor: color.hex }}
-              onClick={() => setActiveColor(color.value)}
-              aria-label={color.value}
-            />
-          ))}
+          {colorOptions.map((color) => {
+            const isLight = ['#FFFFFF', '#FFFF00', '#FFC0CB'].includes(color.hex.toUpperCase());
+            return (
+              <button
+                key={color.value}
+                type="button"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${color.border ? "border border-gray-300" : ""} ${activeColor === color.value ? 'ring-2 ring-offset-2 ring-closetx-teal' : 'hover:scale-110'}`}
+                style={{ backgroundColor: color.hex }}
+                onClick={() => setActiveColor(color.value)}
+                aria-label={color.value}
+              >
+                {activeColor === color.value && <Check size={16} className={isLight ? 'text-black' : 'text-white'} />}
+              </button>
+            )
+          })}
         </div>
       </TabsContent>
       

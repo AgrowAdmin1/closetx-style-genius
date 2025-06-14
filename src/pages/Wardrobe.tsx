@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppLayout from '@/components/Layout/AppLayout';
 import ClothingItem, { ClothingItemType } from '@/components/Wardrobe/ClothingItem';
@@ -18,14 +17,10 @@ const mockItems: ClothingItemType[] = [
     name: 'White Cotton Shirt',
     category: 'Tops',
     color: 'White',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: 'https://images.unsplash.com/photo-1620799140408-7c6a0a0d2596?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     season: ['Spring', 'Summer', 'Fall'],
     brand: 'Zara',
-    condition: {
-      isClean: true,
-      isIroned: true,
-      isUsed: false
-    },
+    condition: { isClean: true, isIroned: true, isUsed: false },
     isTrending: true
   },
   {
@@ -33,59 +28,40 @@ const mockItems: ClothingItemType[] = [
     name: 'Blue Denim Jeans',
     category: 'Bottoms',
     color: 'Blue',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: 'https://images.unsplash.com/photo-1604176354204-926873782855?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     season: ['All Season'],
     brand: 'Levi\'s',
-    condition: {
-      isClean: true,
-      isIroned: false,
-      isUsed: true,
-      lastWorn: '2 days ago'
-    }
+    condition: { isClean: true, isIroned: false, isUsed: true, lastWorn: '2 days ago' }
   },
   {
     id: '3',
     name: 'Black Leather Jacket',
     category: 'Outerwear',
     color: 'Black',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     season: ['Fall', 'Winter'],
     brand: 'H&M',
-    condition: {
-      isClean: false,
-      isIroned: false,
-      isUsed: true,
-      lastWorn: 'Yesterday'
-    }
+    condition: { isClean: false, isIroned: false, isUsed: true, lastWorn: 'Yesterday' }
   },
   {
     id: '4',
     name: 'White Sneakers',
     category: 'Footwear',
     color: 'White',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     season: ['All Season'],
     brand: 'Nike',
-    condition: {
-      isClean: false,
-      isIroned: false,
-      isUsed: true,
-      lastWorn: '3 days ago'
-    }
+    condition: { isClean: false, isIroned: false, isUsed: true, lastWorn: '3 days ago' }
   },
   {
     id: '5',
     name: 'Red Summer Dress',
     category: 'Dresses',
     color: 'Red',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
     season: ['Summer'],
     brand: 'Mango',
-    condition: {
-      isClean: true,
-      isIroned: true,
-      isUsed: false
-    },
+    condition: { isClean: true, isIroned: true, isUsed: false },
     isTrending: true
   },
 ];
