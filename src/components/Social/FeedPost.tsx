@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Droplets, Wind } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import PostAnalysisDialog from "./PostAnalysisDialog";
 
 export type ClothingItemDetail = {
   id: string;
@@ -70,6 +70,8 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
     }
   };
 
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
   return (
     <Card className={`${className} hover:shadow-md transition-all duration-300`}>
       <CardHeader className="p-4">
@@ -94,13 +96,13 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
       
       <div 
         className="aspect-square overflow-hidden cursor-pointer relative"
-        onClick={() => onPostClick && onPostClick(post.id)}
+        onClick={() => setShowAnalysis(true)}
       >
         <img 
           src={post.imageUrl} 
           alt={`${post.userName}'s post`} 
           className="w-full h-full object-cover"
-          style={{filter: "none"}} // Remove any artificial filters
+          style={{filter: "none"}}
         />
         
         {/* Subtle overlay to enhance depth perception and focus */}
@@ -159,6 +161,13 @@ const FeedPost: React.FC<FeedPostProps> = ({ post, onPostClick, className }) => 
           )
         ))}
       </div>
+
+      <PostAnalysisDialog
+        open={showAnalysis}
+        onOpenChange={setShowAnalysis}
+        imageUrl={post.imageUrl}
+        items={post.outfitDetails ?? []}
+      />
       
       <CardContent className="p-4">
         <SocialActions 
