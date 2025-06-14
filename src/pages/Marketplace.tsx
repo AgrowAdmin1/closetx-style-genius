@@ -9,6 +9,20 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import OrderProcessing from '@/components/Marketplace/OrderProcessing';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import VirtualTryOnDialog from '@/components/Marketplace/VirtualTryOnDialog';
+import SocialBadges from '@/components/Marketplace/SocialBadges';
+
+const mockFriends = [
+  { firstName: 'Ananya' },
+  { firstName: 'Riya' }
+];
+
+const shopTeasers = [
+  "Ananya has this in her wishlist!",
+  "Riya is eyeing this!",
+  "Trending in your circle!",
+  "Only 2 left – don't let your friend get it first!"
+];
 
 type ProductType = {
   id: string;
@@ -103,6 +117,8 @@ const Marketplace = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [cartItems, setCartItems] = useState<Array<{id: string, name: string, price: string, quantity: number, image?: string}>>([]);
   const [showOrderProcessing, setShowOrderProcessing] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<ProductType | null>(null);
 
   const toggleFavorite = (id: string) => {
     setProducts(products.map(product => 
@@ -132,6 +148,19 @@ const Marketplace = () => {
     }
     
     toast.success(`Added ${product.name} to cart`);
+    setLastAddedItem(product); // For Share dialog
+    setShowShareDialog(true);
+  };
+
+  // UI only: randomly mock social signals for now
+  const getSocialBadges = (productId: string) => {
+    // Tease on items 1, 3, 5; friend bought on 2, 4, 6 for demo
+    const idx = Number(productId) % 3;
+    return {
+      trending: idx === 0,
+      friendBought: idx === 1,
+      teasingText: idx === 2 ? shopTeasers[Number(productId) % shopTeasers.length] : undefined,
+    };
   };
 
   const filteredProducts = products.filter(product => {
@@ -280,44 +309,80 @@ const Marketplace = () => {
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                {product.isNew && (
-                  <div className="absolute top-2 left-2 bg-white text-closetx-charcoal text-xs px-2 py-1 rounded-full font-semibold shadow">
-                    New
-                  </div>
-                )}
+                {/* BADGES: Trending/Friend */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                  {product.isNew && (
+                    <div className="bg-white text-closetx-charcoal text-xs px-2 py-1 rounded-full font-semibold shadow">
+                      New
+                    </div>
+                  )}
+                  <SocialBadges {...getSocialBadges(product.id)} />
+                </div>
+                {/* Favorite */}
                 <button 
                   className={`absolute top-2 right-2 rounded-full p-1.5 shadow-md transition-colors ${product.favorited ? 'bg-closetx-terracotta text-white' : 'bg-white/80 backdrop-blur-sm hover:bg-white'}`}
                   onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
                 >
                   <Heart size={16} fill={product.favorited ? 'currentColor' : 'none'} />
                 </button>
-                <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                   <Button 
-                    size="sm" 
-                    variant="default"
-                    className="w-full bg-black/70 text-white backdrop-blur-sm hover:bg-black"
-                    onClick={(e) => { e.stopPropagation(); addToCart(product); }}
-                  >
-                    <ShoppingBag size={16} className="mr-2"/>
-                    Add to Cart
-                  </Button>
+                {/* ACTIONS: Shop This Look, Virtual Try-On, Add to Cart */}
+                <div className="absolute bottom-2 left-2 right-2 z-10 transition-opacity opacity-100">
+                  <div className="flex flex-col gap-2 w-full">
+                    <VirtualTryOnDialog 
+                      itemImage={product.image}
+                      itemName={product.name}
+                      trigger={
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full bg-white/90 backdrop-blur hover:bg-white/95"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          Try On Virtually
+                        </Button>
+                      }
+                    />
+                    <Button 
+                      size="sm" 
+                      variant="default"
+                      className="w-full bg-black/70 text-white backdrop-blur-sm hover:bg-black"
+                      onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+                    >
+                      <ShoppingBag size={16} className="mr-2"/>
+                      Add to Cart
+                    </Button>
+                    <div className="flex gap-2 w-full">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="w-1/2"
+                        onClick={e => { e.stopPropagation(); toast.info('Shop similar looks coming soon!'); }}
+                      >
+                        Buy Similar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-1/2"
+                        onClick={e => { e.stopPropagation(); toast.info('Shop this look coming soon!'); }}
+                      >
+                        Shop This Look
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div 
-                className="p-2 cursor-pointer"
-                onClick={() => navigate(`/item/${product.id}`)}
-              >
+              <div className="p-2 cursor-pointer" onClick={() => navigate(`/item/${product.id}`)}>
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
-                   <div className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-sm flex items-center mr-1">
+                  <div className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-sm flex items-center mr-1">
                     <Tag size={10} className="mr-0.5" />
                     {product.sustainabilityScore.toFixed(1)}
                   </div>
                 </div>
-                
                 <p className="text-xs text-gray-500 truncate">{product.brand}</p>
-                
+                {/* Social badges inline (for extra teaser below) */}
+                <SocialBadges {...getSocialBadges(product.id)} />
                 <div className="flex flex-wrap gap-1 mt-1.5">
                   {product.badges.slice(0, 2).map((badge, index) => (
                     <Badge key={index} variant="secondary" className="text-xxs py-0 px-1.5 font-normal">
@@ -325,7 +390,6 @@ const Marketplace = () => {
                     </Badge>
                   ))}
                 </div>
-                
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-semibold text-base">{product.price}</p>
                 </div>
@@ -346,9 +410,28 @@ const Marketplace = () => {
             </Button>
           </div>
         )}
+
+        {/* Share Flex Dialog */}
+        {showShareDialog && lastAddedItem && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onClick={() => setShowShareDialog(false)}>
+            <div className="bg-white rounded-lg p-6 flex flex-col gap-4 items-center shadow-xl" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-semibold text-center mb-2">Flaunt your pick!</h3>
+              <img src={lastAddedItem.image} alt={lastAddedItem.name} className="w-32 h-40 object-cover rounded-lg mb-1" />
+              <div className="text-center text-sm">Let your friends see what you just added to cart!</div>
+              <Button className="w-full bg-closetx-teal" onClick={() => { setShowShareDialog(false); toast.success("Shared to your story!"); }}>
+                Share with Friends
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setShowShareDialog(false)}>
+                Skip
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
 };
 
 export default Marketplace;
+
+// NOTE: Marketplace.tsx is now quite large! Consider asking to refactor this file into smaller ones for maintainability.
