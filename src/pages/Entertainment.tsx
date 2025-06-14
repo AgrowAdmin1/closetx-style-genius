@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Music, Ticket, PartyPopper, Restaurant, Book } from 'lucide-react';
+import { Calendar, Music, Ticket, PartyPopper, UtensilsCrossed, Book } from 'lucide-react';
 import AppLayout from '@/components/Layout/AppLayout';
 
 type Event = {
@@ -121,7 +120,7 @@ const Entertainment = () => {
             <span className="hidden sm:inline">Parties</span>
           </TabsTrigger>
           <TabsTrigger value="restaurants" className="flex items-center gap-1">
-            <Restaurant size={16} />
+            <UtensilsCrossed size={16} />
             <span className="hidden sm:inline">Dining</span>
           </TabsTrigger>
           <TabsTrigger value="books" className="flex items-center gap-1">
@@ -284,7 +283,7 @@ const EventCard = ({ event, onClick }: EventCardProps) => {
     switch(type) {
       case 'concert': return <Music size={16} />;
       case 'party': return <PartyPopper size={16} />;
-      case 'restaurant': return <Restaurant size={16} />;
+      case 'restaurant': return <UtensilsCrossed size={16} />;
       case 'fashion': return <Ticket size={16} />;
       case 'book': return <Book size={16} />;
       default: return null;
