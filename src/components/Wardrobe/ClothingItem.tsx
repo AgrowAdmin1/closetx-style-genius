@@ -60,11 +60,11 @@ const ClothingItem: React.FC<ClothingItemProps> = ({
   return (
     <>
       <Card 
-        className="closetx-card overflow-hidden flex flex-col relative hover:shadow-md transition-all duration-300 cursor-pointer" 
+        className="closetx-card overflow-hidden flex flex-col relative transition-all duration-300 cursor-pointer" 
         onClick={onClick}
       >
         {item.isTrending && (
-          <Badge className="absolute top-2 right-2 bg-closetx-teal/90 z-10">
+          <Badge className="absolute top-2 right-2 bg-closetx-teal z-10">
             Trending
           </Badge>
         )}
@@ -82,7 +82,7 @@ const ClothingItem: React.FC<ClothingItemProps> = ({
           />
           
           {/* Natural lighting overlay to enhance image appearance */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
           
           {/* Action buttons */}
           <div className="absolute bottom-2 right-2 flex gap-2">
@@ -90,7 +90,7 @@ const ClothingItem: React.FC<ClothingItemProps> = ({
               <Button 
                 size="icon"
                 variant="secondary"
-                className="bg-white/80 hover:bg-white"
+                className="bg-white/90 backdrop-blur-sm hover:bg-white"
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="h-4 w-4" />
@@ -101,7 +101,7 @@ const ClothingItem: React.FC<ClothingItemProps> = ({
               <Button 
                 size="icon"
                 variant="secondary"
-                className="bg-white/80 hover:bg-white"
+                className="bg-white/90 backdrop-blur-sm hover:bg-white"
                 onClick={handleRateItem}
               >
                 <Star className="h-4 w-4" />

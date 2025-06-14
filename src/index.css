@@ -45,6 +45,8 @@
   body {
     @apply bg-closetx-offwhite text-closetx-charcoal;
     font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Custom scrollbar */
@@ -70,7 +72,11 @@
 
 @layer components {
   .closetx-card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300;
+    @apply bg-white rounded-xl shadow-subtle transition-shadow duration-300;
+  }
+
+  .closetx-card:hover {
+    @apply shadow-subtle-hover;
   }
 
   .closetx-button-primary {

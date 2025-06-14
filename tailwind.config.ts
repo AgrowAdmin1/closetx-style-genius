@@ -66,16 +66,24 @@ export default {
 				// Custom ClosetX colors
 				closetx: {
 					teal: '#0D7377',
+					'teal-light': '#368B8E',
+					'teal-dark': '#0A5C5F',
 					beige: '#F4F0E6',
 					terracotta: '#E57F5E',
 					charcoal: '#323232',
-					offwhite: '#F9F9F9'
+					offwhite: '#FBFBFB',
+					'gray-soft': '#F3F4F6'
 				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: 'calc(var(--radius) + 8px)',
+			},
+			boxShadow: {
+				'subtle': '0 2px 12px rgba(0, 0, 0, 0.04)',
+				'subtle-hover': '0 4px 16px rgba(0, 0, 0, 0.08)',
 			},
 			keyframes: {
 				'accordion-down': {

@@ -65,11 +65,11 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
 
   return (
     <Tabs defaultValue="categories" className="mb-6">
-      <TabsList className="w-full bg-gray-100">
-        <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
-        <TabsTrigger value="colors" className="flex-1">Colors</TabsTrigger>
-        <TabsTrigger value="seasons" className="flex-1">Seasons</TabsTrigger>
-        <TabsTrigger value="condition" className="flex-1">Condition</TabsTrigger>
+      <TabsList className="w-full bg-closetx-gray-soft p-1 h-auto rounded-lg">
+        <TabsTrigger value="categories" className="flex-1 data-[state=active]:bg-white data-[state=active]:text-closetx-charcoal data-[state=active]:shadow-sm rounded-md">Categories</TabsTrigger>
+        <TabsTrigger value="colors" className="flex-1 data-[state=active]:bg-white data-[state=active]:text-closetx-charcoal data-[state=active]:shadow-sm rounded-md">Colors</TabsTrigger>
+        <TabsTrigger value="seasons" className="flex-1 data-[state=active]:bg-white data-[state=active]:text-closetx-charcoal data-[state=active]:shadow-sm rounded-md">Seasons</TabsTrigger>
+        <TabsTrigger value="condition" className="flex-1 data-[state=active]:bg-white data-[state=active]:text-closetx-charcoal data-[state=active]:shadow-sm rounded-md">Condition</TabsTrigger>
       </TabsList>
       
       <TabsContent value="categories" className="mt-4">

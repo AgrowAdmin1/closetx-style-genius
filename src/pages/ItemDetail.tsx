@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/Layout/AppLayout';
@@ -121,8 +122,8 @@ const ItemDetail = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="aspect-square overflow-hidden rounded-lg relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="aspect-[4/5] overflow-hidden rounded-xl relative bg-closetx-gray-soft">
           <img
             src={item.image}
             alt={item.name}
@@ -264,8 +265,8 @@ const ItemDetail = () => {
         <h2 className="text-xl font-semibold">Outfit Suggestions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="overflow-hidden">
-              <div className="aspect-square bg-gray-100"></div>
+            <Card key={i} className="closetx-card overflow-hidden">
+              <div className="aspect-square bg-closetx-gray-soft"></div>
               <div className="p-3">
                 <p className="font-medium text-sm">Outfit Suggestion {i}</p>
                 <p className="text-xs text-gray-500">3 items</p>

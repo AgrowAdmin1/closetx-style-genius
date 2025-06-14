@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ weather }) => {
   };
   
   return (
-    <div className="fixed top-0 left-0 right-0 z-30 h-16 border-b bg-white shadow-sm flex items-center justify-between px-4 lg:px-6">
+    <div className="fixed top-0 left-0 right-0 z-30 h-16 border-b bg-white flex items-center justify-between px-4 lg:px-6">
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center">
           <span className="font-bold text-xl text-closetx-teal">ClosetX</span>

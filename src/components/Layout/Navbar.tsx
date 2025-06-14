@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-10 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white z-10 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       <div className="flex justify-around items-center h-16">
         <NavItem to="/" icon={<Home size={24} />} label="Home" />
         <NavItem to="/wardrobe" icon={<ShoppingBag size={24} />} label="Wardrobe" />
